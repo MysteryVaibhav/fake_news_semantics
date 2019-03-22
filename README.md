@@ -13,6 +13,14 @@ fake_news_semantics
     |   test.xsls
 ```
 
+Dependencies,
+```
+pytorch 1.0.0
+pandas
+tqdm
+xlrd (pip install xlrd)
+```
+
 To train a LSTM model, run the following command,
 ```
 python main.py --batch_size 1024 --config lstm --encoder 0 --mode 0
