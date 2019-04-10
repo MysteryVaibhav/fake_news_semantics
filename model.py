@@ -2,26 +2,40 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pack_padded_sequence
+from layers import GraphConvolution
 
 
 class Classify(torch.nn.Module):
     def __init__(self, params, vocab_size, ntags, pte=None):
         super(Classify, self).__init__()
+        self.params = params
         self.word_embeddings = nn.Embedding(vocab_size, params.emb_dim)
         if pte is None:
             nn.init.xavier_uniform_(self.word_embeddings.weight)
         else:
             self.word_embeddings.weight.data.copy_(torch.from_numpy(pte))
-        self.text_encoder = LstmEncoder(params.hidden_dim, params.emb_dim) if params.encoder == 0 else CnnEncoder(
-            params.filters, params.emb_dim, params.kernel_size)
+        self.text_encoder = CnnEncoder(
+            params.filters, params.emb_dim, params.kernel_size) if params.encoder == 1 else LstmEncoder(
+            params.hidden_dim, params.emb_dim)
         self.dropout = nn.Dropout(params.dropout)
-        self.linear_transform = nn.Linear(in_features=params.hidden_dim,
-                                          out_features=ntags)
+        if params.encoder == 2:
+            self.gcn1 = GraphConvolution(params.hidden_dim, params.node_emb_dim, params.dropout, act=F.relu)
+            self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
+                                              out_features=ntags)
+        else:
+            self.linear_transform = nn.Linear(in_features=params.hidden_dim,
+                                              out_features=ntags)
 
     def forward(self, input_sents, input_lens):
         embeds = self.word_embeddings(input_sents)  # bs * max_seq_len * emb
         h = self.text_encoder(embeds, input_lens)  # bs * 100 * hidden
         h = self.dropout(F.relu(h))  # Relu activation and dropout
+        if self.params.encoder == 2:
+            # Currently it's a dummy matrix with all edge weights one
+            adj_matrix = torch.ones((h.size(0), h.size(0)))
+            h = self.gcn1(h, adj_matrix)
+            # Simple max pool on all node representations
+            h, _ = h.max(dim=0)
         h = self.linear_transform(h)  # bs * ntags
         return h
 

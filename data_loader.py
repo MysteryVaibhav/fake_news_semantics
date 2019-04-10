@@ -15,12 +15,18 @@ class DataLoader:
         UNK = w2i["<unk>"]
 
         # Read in the data and store the dicts
-        self.train = list(self.read_dataset(params.train, w2i))
+        if self.params.encoder == 2:
+            self.train = self.read_dataset_sentence_wise(params.train, w2i)
+        else:
+            self.train = list(self.read_dataset(params.train, w2i))
         print("Average train document length: {}".format(np.mean([len(x[0]) for x in self.train])))
         print("Maximum train document length: {}".format(max([len(x[0]) for x in self.train])))
         w2i = freezable_defaultdict(lambda: UNK, w2i)
         w2i.freeze()
-        self.dev = list(self.read_dataset(params.dev, w2i))
+        if self.params.encoder == 2:
+            self.dev = self.read_dataset_sentence_wise(params.dev, w2i)
+        else:
+            self.dev = list(self.read_dataset(params.dev, w2i))
         self.w2i = w2i
         self.nwords = len(w2i)
         # Treating this as a binary classification problem for now "1: Satire, 4: Trusted"
@@ -30,17 +36,27 @@ class DataLoader:
         kwargs = {'num_workers': 4, 'pin_memory': True} if torch.cuda.is_available() else {}
 
         # Creating data loaders
-        dataset_train = ClassificationDataSet(self.train, self.params)
-        self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
-                                                             collate_fn=dataset_train.collate, shuffle=True, **kwargs)
+        if self.params.encoder == 2:
+            dataset_train = ClassificationGraphDataSet(self.train, self.params)
+            self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
+                                                                 collate_fn=dataset_train.collate, shuffle=True,
+                                                                 **kwargs)
 
-        dataset_dev = ClassificationDataSet(self.dev, self.params)
-        self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
-                                                           collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
+            dataset_dev = ClassificationGraphDataSet(self.dev, self.params)
+            self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
+                                                               collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
+        else:
+            dataset_train = ClassificationDataSet(self.train, self.params)
+            self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
+                                                                 collate_fn=dataset_train.collate, shuffle=True, **kwargs)
 
-        dataset_test = ClassificationDataSet(self.test, self.params)
-        self.test_data_loader = torch.utils.data.DataLoader(dataset_test, batch_size=params.batch_size,
-                                                            collate_fn=dataset_test.collate, shuffle=False, **kwargs)
+            dataset_dev = ClassificationDataSet(self.dev, self.params)
+            self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
+                                                               collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
+
+            dataset_test = ClassificationDataSet(self.test, self.params)
+            self.test_data_loader = torch.utils.data.DataLoader(dataset_test, batch_size=params.batch_size,
+                                                                collate_fn=dataset_test.collate, shuffle=False, **kwargs)
 
     @staticmethod
     def read_dataset(filename, w2i):
@@ -61,6 +77,27 @@ class DataLoader:
             tag = int(row[0])
             # Tag id is reversed in this dataset
             data.append(([w2i[x] for x in row[2].lower().split(" ")], tag + 1 if tag == 0 else tag - 1))
+        return data
+
+    @staticmethod
+    def read_dataset_sentence_wise(filename, w2i):
+        data = []
+        with open(filename, "r") as f:
+            readCSV = csv.reader(f, delimiter=',')
+            csv.field_size_limit(100000000)
+            for tag, doc in readCSV:
+                sentences = doc.split('.')
+                tag = int(tag)
+                if tag in [1, 4]:
+                    # Adjust the tag to {0: Satire, 1: Trusted}
+                    tag = tag - 1 if tag == 1 else tag - 3
+                    sentences_idx = []
+                    for sentence in sentences:
+                        sentence = sentence.lower().strip().split(" ")
+                        if len(sentence) > 1:
+                            sentences_idx.append([w2i[x] for x in sentence])
+                    if len(sentences_idx) > 1:
+                        data.append((sentences_idx, tag))
         return data
 
 
@@ -98,6 +135,43 @@ class ClassificationDataSet(torch.utils.data.TensorDataset):
             padded_sents[i, :len(sent)] = sent[:sent_max_len]
 
         return padded_sents, input_lens, labels
+
+
+class ClassificationGraphDataSet(torch.utils.data.TensorDataset):
+    def __init__(self, data, params):
+        super(ClassificationGraphDataSet, self).__init__()
+        self.params = params
+        # data is a list of tuples (sent, label)
+        self.sents = [x[0] for x in data]
+        self.labels = [x[1] for x in data]
+        self.num_of_samples = len(self.sents)
+
+    def __len__(self):
+        return self.num_of_samples
+
+    def __getitem__(self, idx):
+        return self.sents[idx], len(self.sents[idx]), self.labels[idx]
+
+    def collate(self, batch):
+        sents = np.array([x[0] for x in batch])
+        doc_lens = np.array([x[1] for x in batch])
+        labels = np.array([x[2] for x in batch])
+        # Sort sentences within each document by length
+        documents = []
+
+        for doc in sents:
+            curr_lens = np.array([min(self.params.max_sent_len, len(x)) for x in doc])
+            curr_sents = np.array(doc)
+            sorted_input_seq_len = np.flipud(np.argsort(curr_lens))
+            curr_sents = curr_sents[sorted_input_seq_len]
+            curr_lens = curr_lens[sorted_input_seq_len]
+
+            padded_sents = np.zeros((len(curr_sents), curr_lens[0]))
+            for i, sen in enumerate(curr_sents):
+                padded_sents[i, :len(sen)] = sen[:curr_lens[0]]
+            documents.append((padded_sents, curr_lens))
+
+        return documents, doc_lens, labels
 
 
 class freezable_defaultdict(dict):

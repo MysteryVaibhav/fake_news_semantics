@@ -41,6 +41,14 @@ class Utils:
 
         return np.asscalar(np.mean(losses)), hits / total
 
+    def get_gcn_logits(self, model, docs):
+        logits = []
+        for sents, sent_lens in docs:
+            x_batch = self.to_tensor(sents)
+            logit = model(x_batch, sent_lens)
+            logits.append(logit)
+        return torch.stack(logits)
+
     def train(self, pretrained_emb, save_plots_as):
         model = Classify(self.params, vocab_size=len(self.data_loader.w2i),
                          ntags=self.data_loader.ntags, pte=pretrained_emb)
@@ -65,12 +73,18 @@ class Utils:
             hits = 0
             total = 0
             for sents, lens, labels in tqdm(self.data_loader.train_data_loader):
-                # Converting data to tensors
-                x_batch = self.to_tensor(sents)
                 y_batch = self.to_tensor(labels)
 
-                # Forward pass
-                logits = model(x_batch, lens)
+                if self.params.encoder == 2:
+                    # This is currently unbatched
+                    logits = self.get_gcn_logits(model, sents)
+                else:
+                    # Converting data to tensors
+                    x_batch = self.to_tensor(sents)
+
+                    # Forward pass
+                    logits = model(x_batch, lens)
+
                 loss = loss_fn(logits, y_batch)
 
                 # Book keeping

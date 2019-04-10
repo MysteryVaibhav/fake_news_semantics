@@ -20,6 +20,7 @@ def parse_arguments():
     parser.add_argument("--freq_cutoff", dest="freq_cutoff", type=int, default=2)
     parser.add_argument("--emb_dim", dest="emb_dim", type=int, default=100)
     parser.add_argument("--hidden_dim", dest="hidden_dim", type=int, default=100)
+    parser.add_argument("--node_emb_dim", dest="node_emb_dim", type=int, default=32)
     parser.add_argument("--filters", dest="filters", type=int, default=100)
     parser.add_argument("--kernel_size", dest="kernel_size", type=int, default=3)
     parser.add_argument("--max_epochs", dest="max_epochs", type=int, default=20)
@@ -28,8 +29,9 @@ def parse_arguments():
     parser.add_argument("--lr", dest="lr", type=float, default=1e-3)
     parser.add_argument("--dropout", dest="dropout", type=float, default=0.2)
     parser.add_argument("--weight_decay", dest="weight_decay", type=float, default=1e-5)
-    parser.add_argument("--encoder", dest="encoder", type=int, default=0, help='0: LSTM encoder for text,'
-                                                                               '1: CNN encoder for text')
+    parser.add_argument("--encoder", dest="encoder", type=int, default=2, help='0: LSTM encoder for text,'
+                                                                               '1: CNN encoder for text'
+                                                                               '2: GCN encoder for text')
     parser.add_argument("--config", dest="config", type=str, default='lstm_no_pte', help='Name for saving plots')
     parser.add_argument("--model_file", dest="model_file", type=str, default='lstm.t7', help='For evaluating saved '
                                                                                              'a model')
