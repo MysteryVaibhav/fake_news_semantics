@@ -31,32 +31,29 @@ class DataLoader:
         self.nwords = len(w2i)
         # Treating this as a binary classification problem for now "1: Satire, 4: Trusted"
         self.ntags = 2
-        self.test = self.read_testset(params.test, w2i)
+        if self.params.encoder == 2:
+            self.test = self.read_testset_sentence_wise(params.test, w2i)
+        else:
+            self.test = self.read_testset(params.test, w2i)
         # Setting pin memory and number of workers
         kwargs = {'num_workers': 4, 'pin_memory': True} if torch.cuda.is_available() else {}
 
-        # Creating data loaders
-        if self.params.encoder == 2:
-            dataset_train = ClassificationGraphDataSet(self.train, self.params)
-            self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
-                                                                 collate_fn=dataset_train.collate, shuffle=True,
-                                                                 **kwargs)
+        dataset_train = ClassificationGraphDataSet(self.train, self.params) if self.params.encoder == 2 else \
+            ClassificationDataSet(self.train, self.params)
+        self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
+                                                             collate_fn=dataset_train.collate, shuffle=True,
+                                                             **kwargs)
 
-            dataset_dev = ClassificationGraphDataSet(self.dev, self.params)
-            self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
-                                                               collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
-        else:
-            dataset_train = ClassificationDataSet(self.train, self.params)
-            self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
-                                                                 collate_fn=dataset_train.collate, shuffle=True, **kwargs)
+        dataset_dev = ClassificationGraphDataSet(self.dev, self.params) if self.params.encoder == 2 else \
+            ClassificationDataSet(self.dev, self.params)
+        self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
+                                                           collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
 
-            dataset_dev = ClassificationDataSet(self.dev, self.params)
-            self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
-                                                               collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
-
-            dataset_test = ClassificationDataSet(self.test, self.params)
-            self.test_data_loader = torch.utils.data.DataLoader(dataset_test, batch_size=params.batch_size,
-                                                                collate_fn=dataset_test.collate, shuffle=False, **kwargs)
+        dataset_test = ClassificationGraphDataSet(self.test, self.params) if self.params.encoder == 2 else \
+            ClassificationDataSet(self.test, self.params)
+        self.test_data_loader = torch.utils.data.DataLoader(dataset_test, batch_size=params.batch_size,
+                                                            collate_fn=dataset_test.collate, shuffle=False,
+                                                            **kwargs)
 
     @staticmethod
     def read_dataset(filename, w2i):
@@ -98,6 +95,24 @@ class DataLoader:
                             sentences_idx.append([w2i[x] for x in sentence])
                     if len(sentences_idx) > 1:
                         data.append((sentences_idx, tag))
+        return data
+
+    @staticmethod
+    def read_testset_sentence_wise(filename, w2i):
+        df = pd.read_excel(filename)
+        data = []
+        for row in df.values:
+            sentences = row[2].split('.')
+            tag = int(row[0])
+            # Tag id is reversed in this dataset
+            tag = tag + 1 if tag == 0 else tag - 1
+            sentences_idx = []
+            for sentence in sentences:
+                sentence = sentence.lower().replace("\n", " ").strip().split(" ")
+                if len(sentence) > 1:
+                    sentences_idx.append([w2i[x] for x in sentence])
+            if len(sentences_idx) > 1:
+                data.append((sentences_idx, tag))
         return data
 
 
