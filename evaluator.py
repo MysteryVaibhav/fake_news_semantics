@@ -21,9 +21,13 @@ class Evaluator:
         total = 0
         model.eval()
         for sents, lens, labels in tqdm(self.data_loader.test_data_loader):
-            x_batch = self.utils.to_tensor(sents)
             y_batch = self.utils.to_tensor(labels)
-            logits = model(x_batch, lens)
+            if self.params.encoder == 2:
+                # This is currently unbatched
+                logits = self.utils.get_gcn_logits(model, sents)
+            else:
+                x_batch = self.utils.to_tensor(sents)
+                logits = model(x_batch, lens)
             hits += torch.sum(torch.argmax(logits, dim=1) == y_batch).item()
             total += len(sents)
 
