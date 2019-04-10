@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pack_padded_sequence
@@ -32,12 +33,21 @@ class Classify(torch.nn.Module):
         h = self.dropout(F.relu(h))  # Relu activation and dropout
         if self.params.encoder == 2:
             # Currently it's a dummy matrix with all edge weights one
-            adj_matrix = torch.ones((h.size(0), h.size(0)))
+            adj_matrix = self.to_tensor(np.ones((h.size(0), h.size(0))))
             h = self.gcn1(h, adj_matrix)
             # Simple max pool on all node representations
             h, _ = h.max(dim=0)
         h = self.linear_transform(h)  # bs * ntags
         return h
+    
+    @staticmethod
+    def to_tensor(arr):
+        # list -> Tensor (on GPU if possible)
+        if torch.cuda.is_available():
+            tensor = torch.tensor(arr).type(torch.cuda.FloatTensor)
+        else:
+            tensor = torch.tensor(arr).type(torch.FloatTensor)
+        return tensor
 
 
 class LstmEncoder(torch.nn.Module):
