@@ -37,6 +37,11 @@ To train a BERT model, run the following command,
 python bert_classifier.py --batch_size 4 --max_epochs 10 --max_seq_length 500 --max_sent_length 70 --mode 0
 ```
 
+To train a GCN based model, run the following command,
+```
+python main.py --batch_size 32 --max_epochs 10 --config gcn --max_sent_len 50 --encoder 2 --mode 0
+```
+
 To test the accuracy of the model on the out of domain test set, run the following command,
 
 For the LSTM model,
@@ -54,6 +59,11 @@ For the Bert model,
 python bert_classifier.py --batch_size 4 --model_file model_bert.t7 --max_seq_length 500 --max_sent_length 70 --mode 1
 ```
 
+For the GCN model,
+```
+python main.py --batch_size 32 --max_sent_len 50 --encoder 2 --model_file model_gcn.t7 --mode 1
+```
+
 ## Baseline Results
 
 Model | In domain test set accuracy | Out of domain test set accuracy
@@ -61,3 +71,4 @@ Model | In domain test set accuracy | Out of domain test set accuracy
 CNN | 92.3 | 67.5
 LSTM | 91.4 | 81.4
 BERT | ~88.0 | 80.0
+LSTM + GCN + Max Pool | 92.8 | 85.0
