@@ -30,10 +30,14 @@ class Utils:
         total = 0
         model.eval()
         for sents, lens, labels in self.data_loader.dev_data_loader:
-            x_batch = self.to_tensor(sents)
             y_batch = self.to_tensor(labels)
+            if self.params.encoder == 2:
+                # This is currently unbatched
+                logits = self.get_gcn_logits(model, sents)
+            else:
+                x_batch = self.to_tensor(sents)
+                logits = model(x_batch, lens)
 
-            logits = model(x_batch, lens)
             loss = loss_fn(logits, y_batch)
             hits += torch.sum(torch.argmax(logits, dim=1) == y_batch).item()
             total += len(sents)
