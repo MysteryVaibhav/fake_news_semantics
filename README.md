@@ -42,6 +42,11 @@ To train a GCN based model, run the following command,
 python main.py --batch_size 32 --max_epochs 10 --config gcn --max_sent_len 50 --encoder 2 --mode 0
 ```
 
+To train a GCN based model with attention, run the following command,
+```
+python main.py --batch_size 32 --max_epochs 10 --config gcn_attn --max_sent_len 50 --encoder 3 --mode 0
+```
+
 To test the accuracy of the model on the out of domain test set, run the following command,
 
 For the LSTM model,
@@ -64,6 +69,11 @@ For the GCN model,
 python main.py --batch_size 32 --max_sent_len 50 --encoder 2 --model_file model_gcn.t7 --mode 1
 ```
 
+For the GCN model with attention,
+```
+python main.py --batch_size 32 --max_sent_len 50 --encoder 3 --model_file model_gcn_attn.t7 --mode 1
+```
+
 ## Baseline Results
 
 Model | In domain test set accuracy | Out of domain test set accuracy
@@ -72,4 +82,4 @@ CNN | 92.3 | 67.5
 LSTM | 91.4 | 81.4
 BERT | ~88.0 | 80.0
 LSTM + GCN + Max Pool | 92.8 | 85.0
-LSTM + GCN + Max Pool + Attn | 93.6 | 86.6
+LSTM + GCN + Attn | 93.6 | 86.6
