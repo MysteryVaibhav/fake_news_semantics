@@ -94,6 +94,9 @@ class Classify(torch.nn.Module):
                     fig = plt.figure()
                     im = plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
                     plt.xlabel('Sentence Number')
+                    if mat.shape[0] < 10:
+                        plt.xticks(range(0, mat.shape[0], 1))
+                        plt.yticks(range(0, mat.shape[0], 1))
                     #for j, actual_sent in enumerate(actual_sentence):
                     #    plt.text(10, 2 + j, actual_sent, ha='right', wrap=True, size=2)
                     plt.ylabel('Sentence Number')
@@ -112,6 +115,9 @@ class Classify(torch.nn.Module):
                 #for j, actual_sent in enumerate(actual_sentence):
                 #    plt.text(10, 2 + j, actual_sent, ha='right', wrap=True, size=2)
                 plt.ylabel('Sentence Number')
+                if mat.shape[0] < 10:
+                    plt.xticks(range(0, mat.shape[0], 1))
+                    plt.yticks(range(0, mat.shape[0], 1))
                 fig.colorbar(im)
                 fig.savefig('plots/sample_attn_gat_{}.png'.format(mat.shape[0]))
                 if actual_sentence is not None:
