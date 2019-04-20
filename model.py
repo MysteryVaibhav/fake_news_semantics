@@ -3,7 +3,7 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pack_padded_sequence
-from layers import GraphConvolution
+from layers import GraphConvolution, GraphAttentionLayer
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -29,6 +29,18 @@ class Classify(torch.nn.Module):
                                               out_features=ntags)
         elif params.encoder == 3:
             self.gcn1 = GraphConvolution(params.hidden_dim, params.node_emb_dim, params.dropout, act=F.relu)
+            # Add the attention thingy
+            self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
+                                              out_features=ntags)
+        elif params.encoder == 4:
+            self.gcn1 = GraphAttentionLayer(params.hidden_dim, params.node_emb_dim, params.dropout, 0.2)
+            self.attentions = [GraphAttentionLayer(params.hidden_dim, params.node_emb_dim, dropout=params.dropout,
+                                                   alpha=0.2, concat=True) for _ in range(2)]
+            for i, attention in enumerate(self.attentions):
+                self.add_module('attention_{}'.format(i), attention)
+
+            self.out_att = GraphAttentionLayer(params.node_emb_dim * 2, params.node_emb_dim, dropout=params.dropout,
+                                               alpha=0.2, concat=False)
             # Add the attention thingy
             self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
                                               out_features=ntags)
@@ -63,8 +75,25 @@ class Classify(torch.nn.Module):
                 plt.xlabel('Sentence Number')
                 plt.ylabel('Sentence Number')
                 fig.savefig('plots/sample_attn_{}.png'.format(mat.shape[0]))
+        elif self.params.encoder == 4:
+            # Currently it's a dummy matrix with all edge weights one
+            adj_matrix = np.ones((h.size(0), h.size(0)))
+            # Setting link between same sentences to 0
+            np.fill_diagonal(adj_matrix, 0)
+            adj_matrix = self.to_tensor(adj_matrix)
 
-            h = torch.mm(att, h)
+            h = torch.cat([att(h, adj_matrix) for att in self.attentions], dim=1)
+
+            h = F.dropout(h, self.params.dropout, training=self.training)
+            h, attn = self.out_att(h, adj_matrix, True)
+            h = F.elu(h)
+            if self.params.plot == 1:
+                mat = np.matrix(attn.data.numpy())
+                fig = plt.figure()
+                plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
+                plt.xlabel('Sentence Number')
+                plt.ylabel('Sentence Number')
+                fig.savefig('plots/sample_attn_gat_{}.png'.format(mat.shape[0]))
             # Simple max pool on all node representations
             h, _ = h.max(dim=0)
         h = self.linear_transform(h)  # bs * ntags

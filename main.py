@@ -29,10 +29,11 @@ def parse_arguments():
     parser.add_argument("--lr", dest="lr", type=float, default=1e-3)
     parser.add_argument("--dropout", dest="dropout", type=float, default=0.2)
     parser.add_argument("--weight_decay", dest="weight_decay", type=float, default=1e-5)
-    parser.add_argument("--encoder", dest="encoder", type=int, default=3, help='0: LSTM encoder for text,'
+    parser.add_argument("--encoder", dest="encoder", type=int, default=4, help='0: LSTM encoder for text,'
                                                                                '1: CNN encoder for text'
                                                                                '2: GCN encoder for text'
-                                                                               '3: GCN + attention')
+                                                                               '3: GCN + attention'
+                                                                               '4: GAT')
     parser.add_argument("--config", dest="config", type=str, default='lstm_no_pte', help='Name for saving plots')
     parser.add_argument("--model_file", dest="model_file", type=str, default='model_gcn_attn.t7', help='For evaluating saved '
                                                                                              'a model')
