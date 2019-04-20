@@ -23,6 +23,11 @@ class Classify(torch.nn.Module):
             self.gcn1 = GraphConvolution(params.hidden_dim, params.node_emb_dim, params.dropout, act=F.relu)
             self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
                                               out_features=ntags)
+        elif params.encoder == 3:
+            self.gcn1 = GraphConvolution(params.hidden_dim, params.node_emb_dim, params.dropout, act=F.relu)
+            # Add the attention thingy
+            self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
+                                              out_features=ntags)
         else:
             self.linear_transform = nn.Linear(in_features=params.hidden_dim,
                                               out_features=ntags)
@@ -35,6 +40,18 @@ class Classify(torch.nn.Module):
             # Currently it's a dummy matrix with all edge weights one
             adj_matrix = self.to_tensor(np.ones((h.size(0), h.size(0))))
             h = self.gcn1(h, adj_matrix)
+            # Simple max pool on all node representations
+            h, _ = h.max(dim=0)
+        elif self.params.encoder == 3:
+            # Currently it's a dummy matrix with all edge weights one
+            adj_matrix = np.ones((h.size(0), h.size(0)))
+            # Setting link between same sentences to 0
+            np.fill_diagonal(adj_matrix, 0)
+            adj_matrix = self.to_tensor(adj_matrix)
+            h = self.gcn1(h, adj_matrix)                    # num_sentences * node_emb_dim
+            # Adding self attention layer on the representations
+            att = F.softmax(torch.mm(h, h.transpose(0, 1)) / np.sqrt(self.params.node_emb_dim), dim=1)
+            h = torch.mm(att, h)
             # Simple max pool on all node representations
             h, _ = h.max(dim=0)
         h = self.linear_transform(h)  # bs * ntags

@@ -22,7 +22,7 @@ class Evaluator:
         model.eval()
         for sents, lens, labels in tqdm(self.data_loader.test_data_loader):
             y_batch = self.utils.to_tensor(labels)
-            if self.params.encoder == 2:
+            if self.params.encoder >= 2:
                 # This is currently unbatched
                 logits = self.utils.get_gcn_logits(model, sents)
             else:

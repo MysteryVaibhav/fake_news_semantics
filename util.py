@@ -31,7 +31,7 @@ class Utils:
         model.eval()
         for sents, lens, labels in self.data_loader.dev_data_loader:
             y_batch = self.to_tensor(labels)
-            if self.params.encoder == 2:
+            if self.params.encoder >= 2:
                 # This is currently unbatched
                 logits = self.get_gcn_logits(model, sents)
             else:
@@ -79,7 +79,7 @@ class Utils:
             for sents, lens, labels in tqdm(self.data_loader.train_data_loader):
                 y_batch = self.to_tensor(labels)
 
-                if self.params.encoder == 2:
+                if self.params.encoder >= 2:
                     # This is currently unbatched
                     logits = self.get_gcn_logits(model, sents)
                 else:

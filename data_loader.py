@@ -15,7 +15,7 @@ class DataLoader:
         UNK = w2i["<unk>"]
 
         # Read in the data and store the dicts
-        if self.params.encoder == 2:
+        if self.params.encoder >= 2:
             self.train = self.read_dataset_sentence_wise(params.train, w2i)
         else:
             self.train = list(self.read_dataset(params.train, w2i))
@@ -23,7 +23,7 @@ class DataLoader:
         print("Maximum train document length: {}".format(max([len(x[0]) for x in self.train])))
         w2i = freezable_defaultdict(lambda: UNK, w2i)
         w2i.freeze()
-        if self.params.encoder == 2:
+        if self.params.encoder >= 2:
             self.dev = self.read_dataset_sentence_wise(params.dev, w2i)
         else:
             self.dev = list(self.read_dataset(params.dev, w2i))
@@ -31,25 +31,25 @@ class DataLoader:
         self.nwords = len(w2i)
         # Treating this as a binary classification problem for now "1: Satire, 4: Trusted"
         self.ntags = 2
-        if self.params.encoder == 2:
+        if self.params.encoder >= 2:
             self.test = self.read_testset_sentence_wise(params.test, w2i)
         else:
             self.test = self.read_testset(params.test, w2i)
         # Setting pin memory and number of workers
         kwargs = {'num_workers': 4, 'pin_memory': True} if torch.cuda.is_available() else {}
 
-        dataset_train = ClassificationGraphDataSet(self.train, self.params) if self.params.encoder == 2 else \
+        dataset_train = ClassificationGraphDataSet(self.train, self.params) if self.params.encoder >= 2 else \
             ClassificationDataSet(self.train, self.params)
         self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
                                                              collate_fn=dataset_train.collate, shuffle=True,
                                                              **kwargs)
 
-        dataset_dev = ClassificationGraphDataSet(self.dev, self.params) if self.params.encoder == 2 else \
+        dataset_dev = ClassificationGraphDataSet(self.dev, self.params) if self.params.encoder >= 2 else \
             ClassificationDataSet(self.dev, self.params)
         self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
                                                            collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
 
-        dataset_test = ClassificationGraphDataSet(self.test, self.params) if self.params.encoder == 2 else \
+        dataset_test = ClassificationGraphDataSet(self.test, self.params) if self.params.encoder >= 2 else \
             ClassificationDataSet(self.test, self.params)
         self.test_data_loader = torch.utils.data.DataLoader(dataset_test, batch_size=params.batch_size,
                                                             collate_fn=dataset_test.collate, shuffle=False,
