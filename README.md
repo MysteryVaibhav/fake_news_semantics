@@ -72,3 +72,4 @@ CNN | 92.3 | 67.5
 LSTM | 91.4 | 81.4
 BERT | ~88.0 | 80.0
 LSTM + GCN + Max Pool | 92.8 | 85.0
+LSTM + GCN + Max Pool + Attn | 93.6 | 86.6
