@@ -28,6 +28,7 @@ class DataLoader:
         else:
             self.dev = list(self.read_dataset(params.dev, w2i))
         self.w2i = w2i
+        self.i2w = dict(map(reversed, self.w2i.items()))
         self.nwords = len(w2i)
         # Treating this as a binary classification problem for now "1: Satire, 4: Trusted"
         self.ntags = 2

@@ -11,6 +11,15 @@ class Evaluator:
         self.utils = utils
         self.data_loader = data_loader
 
+    def get_sentences_from_indices(self, docs):
+        actual_sentences = []
+        for doc, sent_lens in docs:
+            sentences = []
+            for i, sent in enumerate(doc):
+                sentences.append(' '.join([self.data_loader.i2w[int(wid)] for wid in sent[:sent_lens[i]]]))
+            actual_sentences.append(sentences)
+        return actual_sentences
+
     def evaluate(self):
         model = Classify(self.params, vocab_size=len(self.data_loader.w2i),
                          ntags=self.data_loader.ntags, pte=None)
@@ -26,9 +35,13 @@ class Evaluator:
         all_predicted = None
         for sents, lens, labels in tqdm(self.data_loader.test_data_loader):
             y_batch = self.utils.to_tensor(labels)
+
+            if self.params.plot == 1:
+                actual_sentences = None#self.get_sentences_from_indices(sents)
+
             if self.params.encoder >= 2:
                 # This is currently unbatched
-                logits = self.utils.get_gcn_logits(model, sents)
+                logits = self.utils.get_gcn_logits(model, sents, actual_sentences)
             else:
                 x_batch = self.utils.to_tensor(sents)
                 logits = model(x_batch, lens)

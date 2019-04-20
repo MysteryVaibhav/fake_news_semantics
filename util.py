@@ -45,11 +45,14 @@ class Utils:
 
         return np.asscalar(np.mean(losses)), hits / total
 
-    def get_gcn_logits(self, model, docs):
+    def get_gcn_logits(self, model, docs, actual_sentences=None):
         logits = []
-        for sents, sent_lens in docs:
+        for i, (sents, sent_lens) in enumerate(docs):
             x_batch = self.to_tensor(sents)
-            logit = model(x_batch, sent_lens)
+            if actual_sentences is not None:
+                logit = model(x_batch, sent_lens, actual_sentences[i])
+            else:
+                logit = model(x_batch, sent_lens)
             logits.append(logit)
         return torch.stack(logits)
 

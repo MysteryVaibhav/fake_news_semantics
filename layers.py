@@ -55,7 +55,7 @@ class GraphAttentionLayer(nn.Module):
 
         self.leakyrelu = nn.LeakyReLU(self.alpha)
 
-    def forward(self, input, adj, return_attention=False):
+    def forward(self, input, adj):
         h = torch.mm(input, self.W)
         N = h.size()[0]
 
@@ -69,13 +69,9 @@ class GraphAttentionLayer(nn.Module):
         h_prime = torch.matmul(attention, h)
 
         if self.concat:
-            if return_attention:
-                return F.elu(h_prime), attention
-            return F.elu(h_prime)
+            return F.elu(h_prime), attention
         else:
-            if return_attention:
-                return h_prime, attention
-            return h_prime
+            return h_prime, attention
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' + str(self.in_features) + ' -> ' + str(self.out_features) + ')'
