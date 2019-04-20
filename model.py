@@ -4,6 +4,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pack_padded_sequence
 from layers import GraphConvolution
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 
 class Classify(torch.nn.Module):
@@ -51,6 +55,15 @@ class Classify(torch.nn.Module):
             h = self.gcn1(h, adj_matrix)                    # num_sentences * node_emb_dim
             # Adding self attention layer on the representations
             att = F.softmax(torch.mm(h, h.transpose(0, 1)) / np.sqrt(self.params.node_emb_dim), dim=1)
+
+            if self.params.plot == 1:
+                mat = np.matrix(att.data.numpy())
+                fig = plt.figure()
+                plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
+                plt.xlabel('Sentence Number')
+                plt.ylabel('Sentence Number')
+                fig.savefig('plots/sample_attn_{}.png'.format(mat.shape[0]))
+
             h = torch.mm(att, h)
             # Simple max pool on all node representations
             h, _ = h.max(dim=0)

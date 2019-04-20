@@ -34,8 +34,9 @@ def parse_arguments():
                                                                                '2: GCN encoder for text'
                                                                                '3: GCN + attention')
     parser.add_argument("--config", dest="config", type=str, default='lstm_no_pte', help='Name for saving plots')
-    parser.add_argument("--model_file", dest="model_file", type=str, default='lstm.t7', help='For evaluating saved '
+    parser.add_argument("--model_file", dest="model_file", type=str, default='model_gcn_attn.t7', help='For evaluating saved '
                                                                                              'a model')
+    parser.add_argument("--plot", dest="plot", type=int, default=0, help='set to plot attn')
     parser.add_argument("--mode", dest="mode", type=int, default=0, help='0: train, 1:test')
     if not os.path.exists("models/"):
         os.makedirs("models/")
