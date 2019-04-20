@@ -86,11 +86,23 @@ python main.py --batch_size 32 --max_sent_len 50 --encoder 4 --model_file model_
 
 ## Baseline Results
 
-Model | In domain test set accuracy | Out of domain test set accuracy
---- | --- | ---
-CNN | 92.3 | 67.5
-LSTM | 91.4 | 81.4
-BERT | ~88.0 | 80.0
-LSTM + GCN + Max Pool | 92.8 | 85.0
-LSTM + GCN + Attn | 93.6 | 86.6
-LSTM + GAT | 93.5 | 88.6
+### In domain test set accuracy
+Model | Acc | Prec | Recall | F1
+--- | --- | --- | --- | ---
+CNN | 92.3 | | |
+LSTM | 91.4 | | | 
+BERT | ~88.0 | | | 
+LSTM + GCN + Max Pool | 92.8 | | | 
+LSTM + GCN + Attn | 93.6 | | |
+LSTM + GAT | 93.5 | | |
+
+### Out of domain test set accuracy
+Model | Acc | Prec | Recall | F1
+--- | --- | --- | --- | ---
+CNN | 67.5 | 67.5 | 67.5 | 67.4
+LSTM | 81.4 | 82.2 | 81.4 | 81.3
+BERT | 80.0 | | | 
+LSTM + GCN + Max Pool | 85.0 | 85.9 | 85.0 | 85.1
+LSTM + GCN + Attn | 86.6 | 87.1 | 86.9 | 86.9
+LSTM + GAT | 88.6 | 89.1 | 88.9 | 88.9
+SoTA | - | 90.0 | 84.0 | 87.0
