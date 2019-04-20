@@ -6,6 +6,7 @@ from torch.utils.data import TensorDataset, DataLoader, SequentialSampler
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.modeling import BertModel, BertConfig
 from pytorch_pretrained_bert.optimization import BertAdam
+from sklearn.metrics import precision_recall_fscore_support
 from tqdm import tqdm
 import matplotlib
 import pandas as pd
@@ -245,10 +246,10 @@ def main():
     parser.add_argument("--max_seq_length", default=500, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. Sequences longer "
                              "than this will be truncated, and sequences shorter than this will be padded.")
-    parser.add_argument("--max_sent_length", default=50, type=int)
+    parser.add_argument("--max_sent_length", default=70, type=int)
     parser.add_argument("--weight_decay", dest="weight_decay", type=float, default=1e-5)
     parser.add_argument("--batch_size", default=2, type=int, help="Batch size for predictions.")
-    parser.add_argument("--mode", dest="mode", type=int, default=0, help='0: train, 1:test')
+    parser.add_argument("--mode", dest="mode", type=int, default=1, help='0: train, 1:test')
     parser.add_argument("--model_file", dest="model_file", type=str, default='model_bert.t7', help='For evaluating a '
                                                                                                    'saved model')
     args = parser.parse_args()
@@ -359,13 +360,25 @@ def main():
         hits = 0
         total = 0
         model.eval()
-        for input_features, input_labels in test_data_loader:
+        all_actual = None
+        all_predicted = None
+        for input_features, input_labels in tqdm(test_data_loader):
             logits = model(input_features)
-            hits += torch.sum(torch.argmax(logits, dim=1) == input_labels).item()
+            predicted = torch.argmax(logits, dim=1)
+            hits += torch.sum(predicted == input_labels).item()
             total += len(input_features)
+            all_predicted = predicted if all_predicted is None else np.concatenate((all_predicted,
+                                                                                    predicted.cpu().data.numpy()))
+            labels = input_labels.cpu().data.numpy()
+            all_actual = labels if all_actual is None else np.concatenate((all_actual, labels))
 
         accuracy = hits / total
+        prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
+        prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
         print("Accuracy on the OOD test set: {}".format(accuracy))
+        print("Precision on the OOD test set macro / micro: {}, {}".format(prec_mac, prec_mic))
+        print("Recall on the OOD test set macro / micro: {}, {}".format(recall_mac, recall_mic))
+        print("F1 on the OOD test set macro / micro: {}, {}".format(f1_mac, f1_mic))
 
 
 if __name__ == "__main__":

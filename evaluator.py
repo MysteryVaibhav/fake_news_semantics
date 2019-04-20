@@ -1,6 +1,8 @@
 import torch
 from model import Classify
 from tqdm import tqdm
+import numpy as np
+from sklearn.metrics import precision_recall_fscore_support
 
 
 class Evaluator:
@@ -20,6 +22,8 @@ class Evaluator:
         hits = 0
         total = 0
         model.eval()
+        all_actual = None
+        all_predicted = None
         for sents, lens, labels in tqdm(self.data_loader.test_data_loader):
             y_batch = self.utils.to_tensor(labels)
             if self.params.encoder >= 2:
@@ -28,9 +32,18 @@ class Evaluator:
             else:
                 x_batch = self.utils.to_tensor(sents)
                 logits = model(x_batch, lens)
-            hits += torch.sum(torch.argmax(logits, dim=1) == y_batch).item()
+            predicted = torch.argmax(logits, dim=1)
+            hits += torch.sum(predicted == y_batch).item()
             total += len(sents)
-
+            all_predicted = predicted if all_predicted is None else np.concatenate((all_predicted,
+                                                                                    predicted.cpu().data.numpy()))
+            all_actual = labels if all_actual is None else np.concatenate((all_actual, labels))
         accuracy = hits / total
+        prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
+        prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
         print("Accuracy on the OOD test set: {}".format(accuracy))
+        print("Precision on the OOD test set macro / micro: {}, {}".format(prec_mac, prec_mic))
+        print("Recall on the OOD test set macro / micro: {}, {}".format(recall_mac, recall_mic))
+        print("F1 on the OOD test set macro / micro: {}, {}".format(f1_mac, f1_mic))
+
 

@@ -75,6 +75,8 @@ class Classify(torch.nn.Module):
                 plt.xlabel('Sentence Number')
                 plt.ylabel('Sentence Number')
                 fig.savefig('plots/sample_attn_{}.png'.format(mat.shape[0]))
+            # Simple max pool on all node representations
+            h, _ = h.max(dim=0)
         elif self.params.encoder == 4:
             # Currently it's a dummy matrix with all edge weights one
             adj_matrix = np.ones((h.size(0), h.size(0)))

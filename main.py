@@ -24,12 +24,12 @@ def parse_arguments():
     parser.add_argument("--filters", dest="filters", type=int, default=100)
     parser.add_argument("--kernel_size", dest="kernel_size", type=int, default=3)
     parser.add_argument("--max_epochs", dest="max_epochs", type=int, default=20)
-    parser.add_argument("--max_sent_len", dest="max_sent_len", type=int, default=500)
+    parser.add_argument("--max_sent_len", dest="max_sent_len", type=int, default=50)
     parser.add_argument("--batch_size", dest="batch_size", type=int, default=10)
     parser.add_argument("--lr", dest="lr", type=float, default=1e-3)
     parser.add_argument("--dropout", dest="dropout", type=float, default=0.2)
     parser.add_argument("--weight_decay", dest="weight_decay", type=float, default=1e-5)
-    parser.add_argument("--encoder", dest="encoder", type=int, default=4, help='0: LSTM encoder for text,'
+    parser.add_argument("--encoder", dest="encoder", type=int, default=3, help='0: LSTM encoder for text,'
                                                                                '1: CNN encoder for text'
                                                                                '2: GCN encoder for text'
                                                                                '3: GCN + attention'
@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("--model_file", dest="model_file", type=str, default='model_gcn_attn.t7', help='For evaluating saved '
                                                                                              'a model')
     parser.add_argument("--plot", dest="plot", type=int, default=0, help='set to plot attn')
-    parser.add_argument("--mode", dest="mode", type=int, default=0, help='0: train, 1:test')
+    parser.add_argument("--mode", dest="mode", type=int, default=1, help='0: train, 1:test')
     if not os.path.exists("models/"):
         os.makedirs("models/")
     return parser.parse_args()
