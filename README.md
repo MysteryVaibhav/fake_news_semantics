@@ -96,8 +96,10 @@ LSTM + GCN + Max Pool | 92.8 | | |
 LSTM + GCN + Max Pool + Semantic Adj | 93.6 | | | 
 LSTM + GCN + Attn | 93.6 | | |
 LSTM + GCN + Attn + Semantic Adj| 93.3 | | |
-LSTM + GAT | 93.5 | | |
-LSTM + GAT + Semantic Adj | 92.5 | | |
+LSTM + GAT | | | |
+LSTM + GAT + Semantic Adj | 92.4 | | |
+LSTM + GAT + 2 Attn Heads| 93.5 | | |
+LSTM + GAT + 2 Attn Heads + Semantic Adj | 92.5 | | |
 
 ### Out of domain test set accuracy
 Model | Acc | Prec | Recall | F1
