@@ -110,5 +110,5 @@ LSTM + GCN + Max Pool + Semantic Adj | 88.1 | 88.3 | 88.1 | 88.0
 LSTM + GCN + Self Attn | 86.6 | 87.1 | 86.9 | 86.9
 LSTM + GCN + Self Attn + Semantic Adj | 87.8 | 87.8 | 87.8 | 87.8
 LSTM + GAT | 88.6 | 89.1 | 88.9 | 88.9
-LSTM + GAT + Semantic Adj | 83.6 | 86.3 | 83.6 | 83.3 
+LSTM + GAT + Semantic Adj | 84.7 | 85.2 | 84.7 | 84.6 
 SoTA | - | 90.0 | 84.0 | 87.0
