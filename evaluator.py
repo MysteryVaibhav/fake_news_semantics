@@ -35,7 +35,7 @@ class Evaluator:
         all_predicted = None
         for sents, lens, labels, adjs in tqdm(self.data_loader.test_data_loader):
             y_batch = self.utils.to_tensor(labels)
-
+            actual_sentences = None
             if self.params.plot == 1:
                 actual_sentences = None#self.get_sentences_from_indices(sents)
 
