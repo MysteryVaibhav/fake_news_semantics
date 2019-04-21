@@ -29,11 +29,11 @@ class Utils:
         hits = 0
         total = 0
         model.eval()
-        for sents, lens, labels in self.data_loader.dev_data_loader:
+        for sents, lens, labels, adjs in self.data_loader.dev_data_loader:
             y_batch = self.to_tensor(labels)
             if self.params.encoder >= 2:
                 # This is currently unbatched
-                logits = self.get_gcn_logits(model, sents)
+                logits = self.get_gcn_logits(model, sents, adjs)
             else:
                 x_batch = self.to_tensor(sents)
                 logits = model(x_batch, lens)
@@ -45,14 +45,14 @@ class Utils:
 
         return np.asscalar(np.mean(losses)), hits / total
 
-    def get_gcn_logits(self, model, docs, actual_sentences=None):
+    def get_gcn_logits(self, model, docs, adjs, actual_sentences=None):
         logits = []
         for i, (sents, sent_lens) in enumerate(docs):
             x_batch = self.to_tensor(sents)
             if actual_sentences is not None:
-                logit = model(x_batch, sent_lens, actual_sentences[i])
+                logit = model(x_batch, sent_lens, adjs[i], actual_sentences[i])
             else:
-                logit = model(x_batch, sent_lens)
+                logit = model(x_batch, sent_lens, adjs[i])
             logits.append(logit)
         return torch.stack(logits)
 
@@ -79,12 +79,12 @@ class Utils:
             train_loss = 0
             hits = 0
             total = 0
-            for sents, lens, labels in tqdm(self.data_loader.train_data_loader):
+            for sents, lens, labels, adjs in tqdm(self.data_loader.train_data_loader):
                 y_batch = self.to_tensor(labels)
 
                 if self.params.encoder >= 2:
                     # This is currently unbatched
-                    logits = self.get_gcn_logits(model, sents)
+                    logits = self.get_gcn_logits(model, sents, adjs)
                 else:
                     # Converting data to tensors
                     x_batch = self.to_tensor(sents)

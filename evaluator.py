@@ -33,7 +33,7 @@ class Evaluator:
         model.eval()
         all_actual = None
         all_predicted = None
-        for sents, lens, labels in tqdm(self.data_loader.test_data_loader):
+        for sents, lens, labels, adjs in tqdm(self.data_loader.test_data_loader):
             y_batch = self.utils.to_tensor(labels)
 
             if self.params.plot == 1:
@@ -41,7 +41,7 @@ class Evaluator:
 
             if self.params.encoder >= 2:
                 # This is currently unbatched
-                logits = self.utils.get_gcn_logits(model, sents, actual_sentences)
+                logits = self.utils.get_gcn_logits(model, sents, adjs, actual_sentences)
             else:
                 x_batch = self.utils.to_tensor(sents)
                 logits = model(x_batch, lens)

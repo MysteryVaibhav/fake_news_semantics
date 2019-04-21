@@ -48,19 +48,21 @@ class Classify(torch.nn.Module):
             self.linear_transform = nn.Linear(in_features=params.hidden_dim,
                                               out_features=ntags)
 
-    def forward(self, input_sents, input_lens, actual_sentence=None):
+    def forward(self, input_sents, input_lens, adj=None, actual_sentence=None):
         embeds = self.word_embeddings(input_sents)  # bs * max_seq_len * emb
         h = self.text_encoder(embeds, input_lens)  # bs * 100 * hidden
         h = self.dropout(F.relu(h))  # Relu activation and dropout
         if self.params.encoder == 2:
             # Currently it's a dummy matrix with all edge weights one
-            adj_matrix = self.to_tensor(np.ones((h.size(0), h.size(0))))
+            adj_matrix = np.ones((h.size(0), h.size(0))) if adj is None else adj
+            np.fill_diagonal(adj_matrix, 0)
+            adj_matrix = self.to_tensor(adj_matrix)
             h = self.gcn1(h, adj_matrix)
             # Simple max pool on all node representations
             h, _ = h.max(dim=0)
         elif self.params.encoder == 3:
             # Currently it's a dummy matrix with all edge weights one
-            adj_matrix = np.ones((h.size(0), h.size(0)))
+            adj_matrix = np.ones((h.size(0), h.size(0))) if adj is None else adj
             # Setting link between same sentences to 0
             np.fill_diagonal(adj_matrix, 0)
             adj_matrix = self.to_tensor(adj_matrix)
@@ -71,15 +73,19 @@ class Classify(torch.nn.Module):
             if self.params.plot == 1:
                 mat = np.matrix(att.data.numpy())
                 fig = plt.figure()
-                plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
+                im = plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
                 plt.xlabel('Sentence Number')
                 plt.ylabel('Sentence Number')
+                fig.colorbar(im)
+                if mat.shape[0] < 10:
+                    plt.xticks(range(0, mat.shape[0], 1))
+                    plt.yticks(range(0, mat.shape[0], 1))
                 fig.savefig('plots/sample_attn_{}.png'.format(mat.shape[0]))
             # Simple max pool on all node representations
             h, _ = h.max(dim=0)
         elif self.params.encoder == 4:
             # Currently it's a dummy matrix with all edge weights one
-            adj_matrix = np.ones((h.size(0), h.size(0)))
+            adj_matrix = np.ones((h.size(0), h.size(0))) if adj is None else adj
             # Setting link between same sentences to 0
             np.fill_diagonal(adj_matrix, 0)
             adj_matrix = self.to_tensor(adj_matrix)
