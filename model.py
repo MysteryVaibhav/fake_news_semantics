@@ -35,11 +35,11 @@ class Classify(torch.nn.Module):
         elif params.encoder == 4:
             self.gcn1 = GraphAttentionLayer(params.hidden_dim, params.node_emb_dim, params.dropout, 0.2)
             self.attentions = [GraphAttentionLayer(params.hidden_dim, params.node_emb_dim, dropout=params.dropout,
-                                                   alpha=0.2, concat=True) for _ in range(2)]
+                                                   alpha=0.2, concat=True) for _ in range(0)]
             for i, attention in enumerate(self.attentions):
                 self.add_module('attention_{}'.format(i), attention)
 
-            self.out_att = GraphAttentionLayer(params.node_emb_dim * 2, params.node_emb_dim, dropout=params.dropout,
+            self.out_att = GraphAttentionLayer(params.hidden_dim, params.node_emb_dim, dropout=params.dropout,
                                                alpha=0.2, concat=False)
             # Add the attention thingy
             self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
@@ -109,7 +109,7 @@ class Classify(torch.nn.Module):
                     fig.colorbar(im)
                     fig.savefig('plots/sample_attn_gat_{}_{}.png'.format(i, mat.shape[0]))
                 hs.append(h_i)
-            h = torch.cat(hs, dim=1)
+            #h = torch.cat(hs, dim=1)
             h = F.dropout(h, self.params.dropout, training=self.training)
             h, attn = self.out_att(h, adj_matrix)
             h = F.elu(h)

@@ -48,7 +48,7 @@ class Evaluator:
             predicted = torch.argmax(logits, dim=1)
             hits += torch.sum(predicted == y_batch).item()
             total += len(sents)
-            all_predicted = predicted if all_predicted is None else np.concatenate((all_predicted,
+            all_predicted = predicted.cpu().data.numpy() if all_predicted is None else np.concatenate((all_predicted,
                                                                                     predicted.cpu().data.numpy()))
             all_actual = labels if all_actual is None else np.concatenate((all_actual, labels))
         accuracy = hits / total
