@@ -198,19 +198,26 @@ class ClassificationGraphDataSet(torch.utils.data.TensorDataset):
         # Sort sentences within each document by length
         documents = []
 
-        for doc in sents:
+        new_adjs = []
+        for doc, adj in zip(sents, adjs):
             curr_lens = np.array([min(self.params.max_sent_len, len(x)) for x in doc])
             curr_sents = np.array(doc)
             sorted_input_seq_len = np.flipud(np.argsort(curr_lens))
             curr_sents = curr_sents[sorted_input_seq_len]
             curr_lens = curr_lens[sorted_input_seq_len]
 
+            new_adj = np.zeros(adj.shape)
+            for i in range(len(adj)):
+                for j in range(len(adj)):
+                    new_adj[i][j] = adj[sorted_input_seq_len[i]][sorted_input_seq_len[j]]
+            new_adjs.append(new_adj)
+
             padded_sents = np.zeros((len(curr_sents), curr_lens[0]))
             for i, sen in enumerate(curr_sents):
                 padded_sents[i, :len(sen)] = sen[:curr_lens[0]]
             documents.append((padded_sents, curr_lens))
 
-        return documents, doc_lens, labels, adjs
+        return documents, doc_lens, labels, new_adjs
 
 
 class freezable_defaultdict(dict):

@@ -114,6 +114,20 @@ class Classify(torch.nn.Module):
             h, attn = self.out_att(h, adj_matrix)
             h = F.elu(h)
             if self.params.plot == 1:
+
+                mat = np.matrix(adj_matrix.cpu().data.numpy())
+                fig = plt.figure()
+                im = plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
+                plt.xlabel('Sentence Number')
+                # for j, actual_sent in enumerate(actual_sentence):
+                #    plt.text(10, 2 + j, actual_sent, ha='right', wrap=True, size=2)
+                plt.ylabel('Sentence Number')
+                if mat.shape[0] < 10:
+                    plt.xticks(range(0, mat.shape[0], 1))
+                    plt.yticks(range(0, mat.shape[0], 1))
+                fig.colorbar(im)
+                fig.savefig('plots/adj/sample_adj_matrix_{}.png'.format(mat.shape[0]))
+
                 mat = np.matrix(attn.cpu().data.numpy())
                 fig = plt.figure()
                 im = plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
@@ -125,9 +139,9 @@ class Classify(torch.nn.Module):
                     plt.xticks(range(0, mat.shape[0], 1))
                     plt.yticks(range(0, mat.shape[0], 1))
                 fig.colorbar(im)
-                fig.savefig('plots/sample_attn_gat_{}.png'.format(mat.shape[0]))
+                fig.savefig('plots/adj/sample_attn_gat_{}.png'.format(mat.shape[0]))
                 if actual_sentence is not None:
-                    file = open('plots/{}.txt'.format(mat.shape[0]), 'w')
+                    file = open('plots/adj/{}.txt'.format(mat.shape[0]), 'w')
                     for actual_sent in actual_sentence:
                         file.write(actual_sent + "\n")
                     file.close()
