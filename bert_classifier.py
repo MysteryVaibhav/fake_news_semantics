@@ -236,8 +236,8 @@ def _evaluate_aux(model, data_loader):
         predicted = torch.argmax(logits, dim=1)
         hits += torch.sum(predicted == input_labels).item()
         total += len(input_features)
-        all_predicted = predicted if all_predicted is None else np.concatenate((all_predicted,
-                                                                                predicted.cpu().data.numpy()))
+        all_predicted = predicted.cpu().data.numpy() if all_predicted is None else np.concatenate((all_predicted,
+                                                                                   predicted.cpu().data.numpy()))
         labels = input_labels.cpu().data.numpy()
         all_actual = labels if all_actual is None else np.concatenate((all_actual, labels))
 
