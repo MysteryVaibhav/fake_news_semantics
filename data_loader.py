@@ -50,7 +50,7 @@ class DataLoader:
             self.adj_test_2 = self.load_adj_matrix('lib_semscore/logs/STS-B/dev-parts', 'dev-adj_matrix-')
             self.test_2, self.adj_test_2 = self.read_dataset_sentence_wise(params.dev, w2i, self.adj_test_2)
         else:
-            self.dev = list(self.read_dataset(params.dev, w2i))
+            self.test_2 = list(self.read_dataset(params.dev, w2i))
         # Setting pin memory and number of workers
         kwargs = {'num_workers': 4, 'pin_memory': True} if torch.cuda.is_available() else {}
 
