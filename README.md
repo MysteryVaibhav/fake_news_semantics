@@ -179,9 +179,9 @@ LSTM + GCN + Max Pool | 96.76 | 96.61 | 96.58 | 96.59 / 96.76
 LSTM + GCN + Max Pool + Semantic Adj | |  |  |
 LSTM + GCN + Attn | 97.57 | 97.25 | 97.63 | 97.43 / 97.57
 LSTM + GCN + Attn + Semantic Adj| |  |  |
-LSTM + GAT ||  |  |
+LSTM + GAT | 97.73| 97.9 | 97.36 | 97.62 / 97.28
 LSTM + GAT + Semantic Adj ||  |  |
-LSTM + GAT + 2 Attn Heads| |  |  |
+LSTM + GAT + 2 Attn Heads| 97.8 | 97.69 | 97.74 | 97.71 / 97.82
 LSTM + GAT + 2 Attn Heads + Semantic Adj ||  |  |
 SoTA | - | - | - | 91.0 |
 
@@ -195,9 +195,9 @@ LSTM + GCN + Max Pool | 65.0 | 66.75 | 64.84 | 63.79 / 65.0
 LSTM + GCN + Max Pool + Semantic Adj | |  |  |
 LSTM + GCN + Attn | 67.08 | 68.6 | 67.0 | 66.42 / 67.08
 LSTM + GCN + Attn + Semantic Adj| |  |  |
-LSTM + GAT ||  |  |
+LSTM + GAT | 65.5| 69.45 | 65.33 | 63.83 / 65.51
 LSTM + GAT + Semantic Adj | |  |  |
-LSTM + GAT + 2 Attn Heads| |  |  |
+LSTM + GAT + 2 Attn Heads| 66.94 | 68.05 | 66.86 | 66.37 / 66.95
 LSTM + GAT + 2 Attn Heads + Semantic Adj | |  |  |
 SoTA | - | - | - | 65.0 |
 
