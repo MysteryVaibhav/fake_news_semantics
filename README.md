@@ -127,8 +127,8 @@ LSTM | 93.22 | 93.17| 92.88| 93.02
 BERT |  | | | 
 LSTM + GCN + Max Pool | 98.08 | 98.12|97.89 |98.02 
 LSTM + GCN + Max Pool + Semantic Adj | 96.77 | 97.57|97.85 |97.7 
-LSTM + GCN + Attn |  | | |
-LSTM + GCN + Attn + Semantic Adj|| | |
+LSTM + GCN + Attn | 98.27 | 98.05| 98.42|98.22
+LSTM + GCN + Attn + Semantic Adj| 98.17| 98.15| 98.06|98.11
 LSTM + GAT | 98.36| 98.44| 98.12|98.29
 LSTM + GAT + Semantic Adj | 98.25 | 98.29| 98.09|98.19
 LSTM + GAT + 2 Attn Heads| 98.44 | 98.44| 98.34|98.39
@@ -142,8 +142,8 @@ LSTM | 68.89 | 69.04| 68.89| 68.83
 BERT | | | | 
 LSTM + GCN + Max Pool | 85.83| 86.16| 85.83| 85.8
 LSTM + GCN + Max Pool + Semantic Adj | 83.89 | 84.73| 83.89|83.79 
-LSTM + GCN + Attn |  | | |
-LSTM + GCN + Attn + Semantic Adj|  | | |
+LSTM + GCN + Attn | 85.27 | 85.59 | 85.27 | 85.24
+LSTM + GCN + Attn + Semantic Adj| 85.56 | 85.57| 85.56|85.55
 LSTM + GAT |86.39| 86.44|86.38 |86.38
 LSTM + GAT + Semantic Adj | 85.27| 85.31| 85.27|85.27
 LSTM + GAT + 2 Attn Heads| 84.72| 85.65| 84.72|84.62
@@ -158,8 +158,8 @@ LSTM | 84.07 | 84.18 | 84.07 | 84.05
 BERT |  |  | | 
 LSTM + GCN + Max Pool | 92.6|  92.61| 92.59|92.59 
 LSTM + GCN + Max Pool + Semantic Adj | 89.73| 90.57 | 89.73|89.68 
-LSTM + GCN + Self Attn | |  | | 
-LSTM + GCN + Self Attn + Semantic Adj ||  | |  
+LSTM + GCN + Self Attn | 91.26 | 91.99|91.26 |91.22
+LSTM + GCN + Self Attn + Semantic Adj |92.4| 92.53 |92.39 |92.39  
 LSTM + GAT | 94.2| 94.21 | 94.2| 94.19
 LSTM + GAT + Semantic Adj | 92.6| 92.69 |92.59 |92.59 
 LSTM + GAT + 2 Attn Heads| 89.66| 90.37 | 89.67| 89.62
