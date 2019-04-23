@@ -129,7 +129,7 @@ class DataLoader:
                         curr_sentence_idx = [w2i[x] for x in sentence]
                         sentences_idx.append(curr_sentence_idx if len(curr_sentence_idx) > 0 else [w2i['<unk>']])
                     if len(sentences_idx) > 1:
-                        data.append((sentences_idx, tag))
+                        data.append((sentences_idx[:self.params.max_sents_in_a_doc], tag))
                         if adj is not None:
                             new_adj.append(adj[count])
                     count += 1
