@@ -91,9 +91,9 @@ class DataLoader:
                     if tag in [1, 4]:
                         # Adjust the tag to {0: Satire, 1: Trusted}
                         yield ([w2i[x] for x in words.lower().split(" ")], tag - 1 if tag == 1 else tag - 3)
-                    else:
-                        # {0: Satire, 1: Hoax, 2: Propaganda, 3: Trusted}
-                        yield ([w2i[x] for x in words.lower().split(" ")], tag - 1)
+                else:
+                    # {0: Satire, 1: Hoax, 2: Propaganda, 3: Trusted}
+                    yield ([w2i[x] for x in words.lower().split(" ")], tag - 1)
 
     @staticmethod
     def read_testset(filename, w2i):
