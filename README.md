@@ -119,6 +119,8 @@ SoTA | - | 90.0 | 84.0 | 87.0
 
 ### Results with a dev/test split based on news sources: This might be a more realistic split
 
+### For two classes Satire / Trusted
+
 ### In domain dev set accuracy
 Model | Acc | Prec | Recall | F1
 --- | --- | --- | --- | ---
@@ -164,3 +166,39 @@ LSTM + GAT | 94.2| 94.21 | 94.2| 94.19
 LSTM + GAT + Semantic Adj | 92.6| 92.69 |92.59 |92.59 
 LSTM + GAT + 2 Attn Heads| 89.66| 90.37 | 89.67| 89.62
 LSTM + GAT + 2 Attn Heads + Semantic Adj | 92.86 | 93.06 | 92.87|92.86 
+
+### For four classes Satire, Hoax, Propaganda and Trusted
+
+### In domain dev set accuracy
+Model | Acc | Prec | Recall | F1
+--- | --- | --- | --- | ---
+CNN |  |  |  |
+LSTM | |  |  |
+BERT | |  |  |
+LSTM + GCN + Max Pool | |  |  | 
+LSTM + GCN + Max Pool + Semantic Adj | |  |  |
+LSTM + GCN + Attn | |  |  |
+LSTM + GCN + Attn + Semantic Adj| |  |  |
+LSTM + GAT ||  |  |
+LSTM + GAT + Semantic Adj ||  |  |
+LSTM + GAT + 2 Attn Heads| |  |  |
+LSTM + GAT + 2 Attn Heads + Semantic Adj ||  |  |
+SoTA | - | - | - | 91.0 |
+
+### Out of domain test set 2 accuracy
+Model | Acc | Prec | Recall | F1
+--- | --- | --- | --- | ---
+CNN | |  |  |
+LSTM | |  |  | 
+BERT | |  |  |
+LSTM + GCN + Max Pool | |  |  |
+LSTM + GCN + Max Pool + Semantic Adj | |  |  |
+LSTM + GCN + Attn | |  |  |
+LSTM + GCN + Attn + Semantic Adj| |  |  |
+LSTM + GAT ||  |  |
+LSTM + GAT + Semantic Adj | |  |  |
+LSTM + GAT + 2 Attn Heads| |  |  |
+LSTM + GAT + 2 Attn Heads + Semantic Adj | |  |  |
+SoTA | - | - | - | 65.0 |
+
+
