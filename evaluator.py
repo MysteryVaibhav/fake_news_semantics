@@ -73,4 +73,14 @@ class Evaluator:
         print("Recall on the OOD test set 2 macro / micro: {}, {}".format(recall_mac, recall_mic))
         print("F1 on the OOD test set 2 macro / micro: {}, {}".format(f1_mac, f1_mic))
 
+        print("----------------------------------------------------------------------")
+
+        accuracy, all_actual, all_predicted = self._evaluate_aux(model, self.data_loader.dev_data_loader)
+        prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
+        prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
+        print("Accuracy on the dev set: {}".format(accuracy))
+        print("Precision on the dev set macro / micro: {}, {}".format(prec_mac, prec_mic))
+        print("Recall on the dev macro / micro: {}, {}".format(recall_mac, recall_mic))
+        print("F1 on the dev macro / micro: {}, {}".format(f1_mac, f1_mic))
+
 
