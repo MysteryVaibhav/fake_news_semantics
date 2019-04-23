@@ -129,8 +129,8 @@ LSTM + GCN + Max Pool | 98.08 | 98.12|97.89 |98.02
 LSTM + GCN + Max Pool + Semantic Adj | 96.77 | 97.57|97.85 |97.7 
 LSTM + GCN + Attn |  | | |
 LSTM + GCN + Attn + Semantic Adj|| | |
-LSTM + GAT | | | |
-LSTM + GAT + Semantic Adj |  | | |
+LSTM + GAT | 98.36| 98.44| 98.12|98.29
+LSTM + GAT + Semantic Adj | 98.25 | 98.29| 98.09|98.19
 LSTM + GAT + 2 Attn Heads|  | | |
 LSTM + GAT + 2 Attn Heads + Semantic Adj |  | | |
 
@@ -144,10 +144,11 @@ LSTM + GCN + Max Pool | 85.83| 86.16| 85.83| 85.8
 LSTM + GCN + Max Pool + Semantic Adj | 83.89 | 84.73| 83.89|83.79 
 LSTM + GCN + Attn |  | | |
 LSTM + GCN + Attn + Semantic Adj|  | | |
-LSTM + GAT || | |
-LSTM + GAT + Semantic Adj |  | | |
-LSTM + GAT + 2 Attn Heads|  | | |
+LSTM + GAT |86.39| 86.44|86.38 |86.38
+LSTM + GAT + Semantic Adj | 85.27| 85.31| 85.27|85.27
+LSTM + GAT + 2 Attn Heads| | | |
 LSTM + GAT + 2 Attn Heads + Semantic Adj |  | | |
+SoTA | - | 90.0 | 84.0 | 87.0
 
 ### Out of domain test set 2 accuracy
 Model | Acc | Prec | Recall | F1
@@ -159,7 +160,7 @@ LSTM + GCN + Max Pool | 92.6|  92.61| 92.59|92.59
 LSTM + GCN + Max Pool + Semantic Adj | 89.73| 90.57 | 89.73|89.68 
 LSTM + GCN + Self Attn | |  | | 
 LSTM + GCN + Self Attn + Semantic Adj ||  | |  
-LSTM + GAT | |  | | 
-LSTM + GAT + Semantic Adj | |  | | 
+LSTM + GAT | 94.2| 94.21 | 94.2| 94.19
+LSTM + GAT + Semantic Adj | 92.6| 92.69 |92.59 |92.59 
 LSTM + GAT + 2 Attn Heads| |  | | 
 LSTM + GAT + 2 Attn Heads + Semantic Adj |  |  | | 
