@@ -132,7 +132,7 @@ LSTM + GCN + Attn + Semantic Adj| 98.17| 98.15| 98.06|98.11
 LSTM + GAT | 98.36| 98.44| 98.12|98.29
 LSTM + GAT + Semantic Adj | 98.25 | 98.29| 98.09|98.19
 LSTM + GAT + 2 Attn Heads| 98.44 | 98.44| 98.34|98.39
-LSTM + GAT + 2 Attn Heads + Semantic Adj |  | | |
+LSTM + GAT + 2 Attn Heads + Semantic Adj | 98.02 | 98.01|97.9 |97.95
 
 ### Out of domain test set 1 accuracy
 Model | Acc | Prec | Recall | F1
@@ -147,7 +147,7 @@ LSTM + GCN + Attn + Semantic Adj| 85.56 | 85.57| 85.56|85.55
 LSTM + GAT |86.39| 86.44|86.38 |86.38
 LSTM + GAT + Semantic Adj | 85.27| 85.31| 85.27|85.27
 LSTM + GAT + 2 Attn Heads| 84.72| 85.65| 84.72|84.62
-LSTM + GAT + 2 Attn Heads + Semantic Adj |  | | |
+LSTM + GAT + 2 Attn Heads + Semantic Adj | 86.94 | 87.04| 86.94|86.94
 SoTA | - | 90.0 | 84.0 | 87.0
 
 ### Out of domain test set 2 accuracy
@@ -163,4 +163,4 @@ LSTM + GCN + Self Attn + Semantic Adj |92.4| 92.53 |92.39 |92.39
 LSTM + GAT | 94.2| 94.21 | 94.2| 94.19
 LSTM + GAT + Semantic Adj | 92.6| 92.69 |92.59 |92.59 
 LSTM + GAT + 2 Attn Heads| 89.66| 90.37 | 89.67| 89.62
-LSTM + GAT + 2 Attn Heads + Semantic Adj |  |  | | 
+LSTM + GAT + 2 Attn Heads + Semantic Adj | 92.86 | 93.06 | 92.87|92.86 
