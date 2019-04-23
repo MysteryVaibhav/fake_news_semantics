@@ -116,3 +116,50 @@ LSTM + GAT + Semantic Adj | 87.5 | 87.5 | 87.5 | 87.4
 LSTM + GAT + 2 Attn Heads| 88.6 | 89.1 | 88.9 | 88.9
 LSTM + GAT + 2 Attn Heads + Semantic Adj | 84.7 | 85.2 | 84.7 | 84.6 
 SoTA | - | 90.0 | 84.0 | 87.0
+
+### Results with a dev/test split based on news sources: This might be a more realistic split
+
+### In domain dev set accuracy
+Model | Acc | Prec | Recall | F1
+--- | --- | --- | --- | ---
+CNN | 91.93| 91.92| 91.47|91.67
+LSTM | 93.22 | 93.17| 92.88| 93.02 
+BERT |  | | | 
+LSTM + GCN + Max Pool |  | | | 
+LSTM + GCN + Max Pool + Semantic Adj |  | | | 
+LSTM + GCN + Attn |  | | |
+LSTM + GCN + Attn + Semantic Adj|| | |
+LSTM + GAT | | | |
+LSTM + GAT + Semantic Adj |  | | |
+LSTM + GAT + 2 Attn Heads|  | | |
+LSTM + GAT + 2 Attn Heads + Semantic Adj |  | | |
+
+### Out of domain test set 1 accuracy
+Model | Acc | Prec | Recall | F1
+--- | --- | --- | --- | ---
+CNN | 64.44 |64.47 | 64.44|64.43
+LSTM | 68.89 | 69.04| 68.89| 68.83 
+BERT | | | | 
+LSTM + GCN + Max Pool | | | | 
+LSTM + GCN + Max Pool + Semantic Adj |  | | | 
+LSTM + GCN + Attn |  | | |
+LSTM + GCN + Attn + Semantic Adj|  | | |
+LSTM + GAT || | |
+LSTM + GAT + Semantic Adj |  | | |
+LSTM + GAT + 2 Attn Heads|  | | |
+LSTM + GAT + 2 Attn Heads + Semantic Adj |  | | |
+
+### Out of domain test set 2 accuracy
+Model | Acc | Prec | Recall | F1
+--- | --- | --- | --- | ---
+CNN | 82.27 |82.27|82.27  |82.27 
+LSTM | 84.07 | 84.18 | 84.07 | 84.05
+BERT |  |  | | 
+LSTM + GCN + Max Pool | |  | | 
+LSTM + GCN + Max Pool + Semantic Adj | |  | | 
+LSTM + GCN + Self Attn ||  | | 
+LSTM + GCN + Self Attn + Semantic Adj ||  | |  
+LSTM + GAT | |  | | 
+LSTM + GAT + Semantic Adj | |  | | 
+LSTM + GAT + 2 Attn Heads| |  | | 
+LSTM + GAT + 2 Attn Heads + Semantic Adj |  |  | | 
