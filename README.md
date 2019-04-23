@@ -124,7 +124,7 @@ Model | Acc | Prec | Recall | F1
 --- | --- | --- | --- | ---
 CNN | 91.93| 91.92| 91.47|91.67
 LSTM | 93.22 | 93.17| 92.88| 93.02 
-BERT |  | | | 
+BERT | 91.72 | 92.74| 90.56|91.31 
 LSTM + GCN + Max Pool | 98.08 | 98.12|97.89 |98.02 
 LSTM + GCN + Max Pool + Semantic Adj | 96.77 | 97.57|97.85 |97.7 
 LSTM + GCN + Attn | 98.27 | 98.05| 98.42|98.22
@@ -139,7 +139,7 @@ Model | Acc | Prec | Recall | F1
 --- | --- | --- | --- | ---
 CNN | 64.44 |64.47 | 64.44|64.43
 LSTM | 68.89 | 69.04| 68.89| 68.83 
-BERT | | | | 
+BERT | 75.83| 76.62| 75.83| 75.65
 LSTM + GCN + Max Pool | 85.83| 86.16| 85.83| 85.8
 LSTM + GCN + Max Pool + Semantic Adj | 83.89 | 84.73| 83.89|83.79 
 LSTM + GCN + Attn | 85.27 | 85.59 | 85.27 | 85.24
@@ -155,7 +155,7 @@ Model | Acc | Prec | Recall | F1
 --- | --- | --- | --- | ---
 CNN | 82.27 |82.27|82.27  |82.27 
 LSTM | 84.07 | 84.18 | 84.07 | 84.05
-BERT |  |  | | 
+BERT | 83.46 | 83.56 | 83.46| 83.45 
 LSTM + GCN + Max Pool | 92.6|  92.61| 92.59|92.59 
 LSTM + GCN + Max Pool + Semantic Adj | 89.73| 90.57 | 89.73|89.68 
 LSTM + GCN + Self Attn | 91.26 | 91.99|91.26 |91.22
