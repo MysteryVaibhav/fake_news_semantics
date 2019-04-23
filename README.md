@@ -172,8 +172,8 @@ LSTM + GAT + 2 Attn Heads + Semantic Adj | 92.86 | 93.06 | 92.87|92.86
 ### In domain dev set accuracy
 Model | Acc | Prec | Recall | F1
 --- | --- | --- | --- | ---
-CNN |  |  |  |
-LSTM | |  |  |
+CNN | 96.48 | 96.41 | 96.18 | 96.28 / 96.48
+LSTM | 88.75| 88.67 | 88.11 | 88.35 / 88.75
 BERT | |  |  |
 LSTM + GCN + Max Pool | |  |  | 
 LSTM + GCN + Max Pool + Semantic Adj | |  |  |
@@ -188,8 +188,8 @@ SoTA | - | - | - | 91.0 |
 ### Out of domain test set 2 accuracy
 Model | Acc | Prec | Recall | F1
 --- | --- | --- | --- | ---
-CNN | |  |  |
-LSTM | |  |  | 
+CNN | 54.03 | 54.5 | 54.03 | 52.6 / 54.03
+LSTM |55.06 | 58.88 | 55.06 | 52.5 / 55.05
 BERT | |  |  |
 LSTM + GCN + Max Pool | |  |  |
 LSTM + GCN + Max Pool + Semantic Adj | |  |  |
