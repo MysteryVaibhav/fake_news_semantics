@@ -7,6 +7,7 @@ from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.modeling import BertModel, BertConfig
 from pytorch_pretrained_bert.optimization import BertAdam
 from sklearn.metrics import precision_recall_fscore_support
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 import matplotlib
 import pandas as pd
@@ -224,6 +225,25 @@ def get_data_loader(args, examples, tokenizer, bert_model, device):
     return train_data_loader
 
 
+def _evaluate_aux(model, data_loader):
+    hits = 0
+    total = 0
+    model.eval()
+    all_actual = None
+    all_predicted = None
+    for input_features, input_labels in tqdm(data_loader):
+        logits = model(input_features)
+        predicted = torch.argmax(logits, dim=1)
+        hits += torch.sum(predicted == input_labels).item()
+        total += len(input_features)
+        all_predicted = predicted if all_predicted is None else np.concatenate((all_predicted,
+                                                                                predicted.cpu().data.numpy()))
+        labels = input_labels.cpu().data.numpy()
+        all_actual = labels if all_actual is None else np.concatenate((all_actual, labels))
+
+    accuracy = hits / total
+    return accuracy, all_actual, all_predicted
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -260,15 +280,16 @@ def main():
     bert_model = BertModel.from_pretrained(args.bert_model)
     bert_model.to(device)
 
+    print("Preparing data...")
+    train_examples = read_examples(args.train, args.max_seq_length)
+    train_examples, dev_examples = train_test_split(train_examples, test_size=0.2, random_state=42)
+    train_dataloader = get_data_loader(args, train_examples, tokenizer, bert_model, device)
+
+    # dev_examples = read_examples(args.dev, args.max_seq_length)
+    dev_dataloader = get_data_loader(args, dev_examples, tokenizer, bert_model, device)
+    print("Preparing data...[OK]")
+
     if args.mode == 0:
-
-        print("Preparing data...")
-        train_examples = read_examples(args.train, args.max_seq_length)
-        train_dataloader = get_data_loader(args, train_examples, tokenizer, bert_model, device)
-
-        dev_examples = read_examples(args.dev, args.max_seq_length)
-        dev_dataloader = get_data_loader(args, dev_examples, tokenizer, bert_model, device)
-        print("Preparing data...[OK]")
 
         model = BertForClassification(args, 2)
         model.to(device)
@@ -356,29 +377,38 @@ def main():
             model = model.cuda()
         # Load the model weights
         model.load_state_dict(torch.load("models/" + args.model_file, map_location=lambda storage, loc: storage))
-
-        hits = 0
-        total = 0
         model.eval()
-        all_actual = None
-        all_predicted = None
-        for input_features, input_labels in tqdm(test_data_loader):
-            logits = model(input_features)
-            predicted = torch.argmax(logits, dim=1)
-            hits += torch.sum(predicted == input_labels).item()
-            total += len(input_features)
-            all_predicted = predicted if all_predicted is None else np.concatenate((all_predicted,
-                                                                                    predicted.cpu().data.numpy()))
-            labels = input_labels.cpu().data.numpy()
-            all_actual = labels if all_actual is None else np.concatenate((all_actual, labels))
 
-        accuracy = hits / total
+        accuracy, all_actual, all_predicted = _evaluate_aux(model, test_data_loader)
         prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
         prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
-        print("Accuracy on the OOD test set: {}".format(accuracy))
-        print("Precision on the OOD test set macro / micro: {}, {}".format(prec_mac, prec_mic))
-        print("Recall on the OOD test set macro / micro: {}, {}".format(recall_mac, recall_mic))
-        print("F1 on the OOD test set macro / micro: {}, {}".format(f1_mac, f1_mic))
+        print("Accuracy on the OOD test set 1: {}".format(accuracy))
+        print("Precision on the OOD test set 1 macro / micro: {}, {}".format(prec_mac, prec_mic))
+        print("Recall on the OOD test set 1 macro / micro: {}, {}".format(recall_mac, recall_mic))
+        print("F1 on the OOD test set 1 macro / micro: {}, {}".format(f1_mac, f1_mic))
+
+        print("----------------------------------------------------------------------")
+
+        test_2_examples = read_examples(args.dev, args.max_seq_length)
+        test_2_dataloader = get_data_loader(args, test_2_examples, tokenizer, bert_model, device)
+
+        accuracy, all_actual, all_predicted = _evaluate_aux(model, test_2_dataloader)
+        prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
+        prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
+        print("Accuracy on the OOD test set 2: {}".format(accuracy))
+        print("Precision on the OOD test set 2 macro / micro: {}, {}".format(prec_mac, prec_mic))
+        print("Recall on the OOD test set 2 macro / micro: {}, {}".format(recall_mac, recall_mic))
+        print("F1 on the OOD test set 2 macro / micro: {}, {}".format(f1_mac, f1_mic))
+
+        print("----------------------------------------------------------------------")
+
+        accuracy, all_actual, all_predicted = _evaluate_aux(model, dev_dataloader)
+        prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
+        prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
+        print("Accuracy on the dev set: {}".format(accuracy))
+        print("Precision on the dev set macro / micro: {}, {}".format(prec_mac, prec_mic))
+        print("Recall on the dev set macro / micro: {}, {}".format(recall_mac, recall_mic))
+        print("F1 on the dev set macro / micro: {}, {}".format(f1_mac, f1_mic))
 
 
 if __name__ == "__main__":
