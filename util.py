@@ -50,9 +50,9 @@ class Utils:
         for i, (sents, sent_lens) in enumerate(docs):
             x_batch = self.to_tensor(sents)
             if actual_sentences is not None:
-                logit = model(x_batch, sent_lens, adjs[i], actual_sentences[i])
+                logit = model(x_batch, sent_lens, adjs[i] if adjs is not None else None, actual_sentences[i])
             else:
-                logit = model(x_batch, sent_lens, adjs[i])
+                logit = model(x_batch, sent_lens, adjs[i] if adjs is not None else None)
             logits.append(logit)
         return torch.stack(logits)
 

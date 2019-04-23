@@ -17,7 +17,8 @@ class DataLoader:
 
         # Read in the data and store the dicts
         if self.params.encoder >= 2:
-            self.adj_train = self.load_adj_matrix('lib_semscore/logs/STS-B/train-parts', 'train-adj_matrix-')
+            self.adj_train = self.load_adj_matrix('lib_semscore/logs/STS-B/train-parts', 'train-adj_matrix-') if \
+                self.params.use_ss == 1 else None
             self.train, self.adj_train = self.read_dataset_sentence_wise(params.train, w2i, self.adj_train)
         else:
             self.train = list(self.read_dataset(params.train, w2i))
@@ -102,9 +103,10 @@ class DataLoader:
                         sentences_idx.append(curr_sentence_idx if len(curr_sentence_idx) > 0 else [w2i['<unk>']])
                     if len(sentences_idx) > 1:
                         data.append((sentences_idx, tag))
-                        new_adj.append(adj[count])
+                        if adj is not None:
+                            new_adj.append(adj[count])
                     count += 1
-        return data, new_adj
+        return data, new_adj if adj is not None else None
 
     @staticmethod
     def load_adj_matrix(path, file_prefix):
@@ -131,9 +133,10 @@ class DataLoader:
                 sentences_idx.append(curr_sentence_idx if len(curr_sentence_idx) > 0 else [w2i['<unk>']])
             if len(sentences_idx) > 1:
                 data.append((sentences_idx, tag))
-                new_adj.append(adj[count])
+                if adj is not None:
+                    new_adj.append(adj[count])
             count += 1
-        return data, new_adj
+        return data, new_adj if adj is not None else None
 
 
 class ClassificationDataSet(torch.utils.data.TensorDataset):
@@ -181,14 +184,15 @@ class ClassificationGraphDataSet(torch.utils.data.TensorDataset):
         self.labels = [x[1] for x in data]
         self.adjs = adj
         self.num_of_samples = len(self.sents)
-        for i, adj in enumerate(self.adjs):
-            assert adj.shape[0] == len(self.sents[i])
+        if adj is not None:
+            for i, adj in enumerate(self.adjs):
+                assert adj.shape[0] == len(self.sents[i])
 
     def __len__(self):
         return self.num_of_samples
 
     def __getitem__(self, idx):
-        return self.sents[idx], len(self.sents[idx]), self.labels[idx], self.adjs[idx]
+        return self.sents[idx], len(self.sents[idx]), self.labels[idx], self.adjs[idx] if self.adjs is not None else None
 
     def collate(self, batch):
         sents = np.array([x[0] for x in batch])
@@ -206,18 +210,19 @@ class ClassificationGraphDataSet(torch.utils.data.TensorDataset):
             curr_sents = curr_sents[sorted_input_seq_len]
             curr_lens = curr_lens[sorted_input_seq_len]
 
-            new_adj = np.zeros(adj.shape)
-            for i in range(len(adj)):
-                for j in range(len(adj)):
-                    new_adj[i][j] = adj[sorted_input_seq_len[i]][sorted_input_seq_len[j]]
-            new_adjs.append(new_adj)
+            if self.adjs is not None:
+                new_adj = np.zeros(adj.shape)
+                for i in range(len(adj)):
+                    for j in range(len(adj)):
+                        new_adj[i][j] = adj[sorted_input_seq_len[i]][sorted_input_seq_len[j]]
+                new_adjs.append(new_adj)
 
             padded_sents = np.zeros((len(curr_sents), curr_lens[0]))
             for i, sen in enumerate(curr_sents):
                 padded_sents[i, :len(sen)] = sen[:curr_lens[0]]
             documents.append((padded_sents, curr_lens))
 
-        return documents, doc_lens, labels, new_adjs
+        return documents, doc_lens, labels, new_adjs if self.adjs is not None else None
 
 
 class freezable_defaultdict(dict):

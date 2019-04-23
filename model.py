@@ -44,6 +44,18 @@ class Classify(torch.nn.Module):
             # Add the attention thingy
             self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
                                               out_features=ntags)
+        elif params.encoder == 5:
+            self.gcn1 = GraphAttentionLayer(params.hidden_dim, params.node_emb_dim, params.dropout, 0.2)
+            self.attentions = [GraphAttentionLayer(params.hidden_dim, params.node_emb_dim, dropout=params.dropout,
+                                                   alpha=0.2, concat=True) for _ in range(2)]
+            for i, attention in enumerate(self.attentions):
+                self.add_module('attention_{}'.format(i), attention)
+
+            self.out_att = GraphAttentionLayer(params.node_emb_dim * 2, params.node_emb_dim, dropout=params.dropout,
+                                               alpha=0.2, concat=False)
+            # Add the attention thingy
+            self.linear_transform = nn.Linear(in_features=params.node_emb_dim,
+                                              out_features=ntags)
         else:
             self.linear_transform = nn.Linear(in_features=params.hidden_dim,
                                               out_features=ntags)
@@ -90,7 +102,50 @@ class Classify(torch.nn.Module):
             np.fill_diagonal(adj_matrix, 0)
             adj_matrix = self.to_tensor(adj_matrix)
 
-            #h = torch.cat([att(h, adj_matrix, idx=i, plot=self.params.plot) for i, att in enumerate(self.attentions)], dim=1)
+            h = F.dropout(h, self.params.dropout, training=self.training)
+            h, attn = self.out_att(h, adj_matrix)
+            h = F.elu(h)
+            if self.params.plot == 1:
+
+                mat = np.matrix(adj_matrix.cpu().data.numpy())
+                fig = plt.figure()
+                im = plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
+                plt.xlabel('Sentence Number')
+                # for j, actual_sent in enumerate(actual_sentence):
+                #    plt.text(10, 2 + j, actual_sent, ha='right', wrap=True, size=2)
+                plt.ylabel('Sentence Number')
+                if mat.shape[0] < 10:
+                    plt.xticks(range(0, mat.shape[0], 1))
+                    plt.yticks(range(0, mat.shape[0], 1))
+                fig.colorbar(im)
+                fig.savefig('plots/adj/sample_adj_matrix_{}.png'.format(mat.shape[0]))
+
+                mat = np.matrix(attn.cpu().data.numpy())
+                fig = plt.figure()
+                im = plt.imshow(mat, interpolation='nearest', cmap=cm.hot, origin='lower')
+                plt.xlabel('Sentence Number')
+                #for j, actual_sent in enumerate(actual_sentence):
+                #    plt.text(10, 2 + j, actual_sent, ha='right', wrap=True, size=2)
+                plt.ylabel('Sentence Number')
+                if mat.shape[0] < 10:
+                    plt.xticks(range(0, mat.shape[0], 1))
+                    plt.yticks(range(0, mat.shape[0], 1))
+                fig.colorbar(im)
+                fig.savefig('plots/adj/sample_attn_gat_{}.png'.format(mat.shape[0]))
+                if actual_sentence is not None:
+                    file = open('plots/adj/{}.txt'.format(mat.shape[0]), 'w')
+                    for actual_sent in actual_sentence:
+                        file.write(actual_sent + "\n")
+                    file.close()
+
+            # Simple max pool on all node representations
+            h, _ = h.max(dim=0)
+        elif self.params.encoder == 5:
+            # Currently it's a dummy matrix with all edge weights one
+            adj_matrix = np.ones((h.size(0), h.size(0))) if adj is None else adj
+            # Setting link between same sentences to 0
+            np.fill_diagonal(adj_matrix, 0)
+            adj_matrix = self.to_tensor(adj_matrix)
 
             hs = []
             for i, att in enumerate(self.attentions):
@@ -109,7 +164,7 @@ class Classify(torch.nn.Module):
                     fig.colorbar(im)
                     fig.savefig('plots/sample_attn_gat_{}_{}.png'.format(i, mat.shape[0]))
                 hs.append(h_i)
-            #h = torch.cat(hs, dim=1)
+            h = torch.cat(hs, dim=1)
             h = F.dropout(h, self.params.dropout, training=self.training)
             h, attn = self.out_att(h, adj_matrix)
             h = F.elu(h)
