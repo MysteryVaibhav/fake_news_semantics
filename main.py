@@ -28,6 +28,7 @@ def parse_arguments():
     parser.add_argument("--batch_size", dest="batch_size", type=int, default=10)
     parser.add_argument("--lr", dest="lr", type=float, default=1e-3)
     parser.add_argument("--dropout", dest="dropout", type=float, default=0.2)
+    parser.add_argument("--ntags", dest="ntags", type=int, default=2)
     parser.add_argument("--weight_decay", dest="weight_decay", type=float, default=1e-5)
     parser.add_argument("--encoder", dest="encoder", type=int, default=5, help='0: LSTM encoder for text,'
                                                                                '1: CNN encoder for text'
@@ -39,7 +40,7 @@ def parse_arguments():
     parser.add_argument("--model_file", dest="model_file", type=str, default='model_gat_adj_latest.t7', help='For '
                                                                                 'evaluating a saved model')
     parser.add_argument("--plot", dest="plot", type=int, default=0, help='set to plot attn')
-    parser.add_argument("--use_ss", dest="use_ss", type=int, default=0, help='use ss model')
+    parser.add_argument("--use_ss", dest="use_ss", type=int, default=1, help='use ss model')
     parser.add_argument("--mode", dest="mode", type=int, default=0, help='0: train, 1:test')
     if not os.path.exists("models/"):
         os.makedirs("models/")

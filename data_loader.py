@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import torch
 import torch.utils.data
+from sklearn.model_selection import train_test_split
 
 
 class DataLoader:
@@ -26,25 +27,35 @@ class DataLoader:
         print("Maximum train document length: {}".format(max([len(x[0]) for x in self.train])))
         w2i = freezable_defaultdict(lambda: UNK, w2i)
         w2i.freeze()
-        if self.params.encoder >= 2:
-            self.adj_dev = self.load_adj_matrix('lib_semscore/logs/STS-B/dev-parts', 'dev-adj_matrix-')
-            self.dev, self.adj_dev = self.read_dataset_sentence_wise(params.dev, w2i, self.adj_dev)
+        # Split the training set into two
+        if self.params.use_ss == 0:
+            self.adj_dev = None
+            self.train, self.dev = train_test_split(self.train, test_size=0.2, random_state=42)
         else:
-            self.dev = list(self.read_dataset(params.dev, w2i))
+            self.train, self.dev, self.adj_train, self.adj_dev = train_test_split(self.train, self.adj_train,
+                                                                                  test_size=0.2,
+                                                                                  random_state=42)
         self.w2i = w2i
         self.i2w = dict(map(reversed, self.w2i.items()))
         self.nwords = len(w2i)
         # Treating this as a binary classification problem for now "1: Satire, 4: Trusted"
-        self.ntags = 2
+        self.ntags = params.ntags
         if self.params.encoder >= 2:
             self.adj_test = self.load_adj_matrix('lib_semscore/logs/STS-B/test-parts', 'test-adj_matrix-')
             self.test, self.adj_test = self.read_testset_sentence_wise(params.test, w2i, self.adj_test)
         else:
             self.test = self.read_testset(params.test, w2i)
+
+        if self.params.encoder >= 2:
+            self.adj_test_2 = self.load_adj_matrix('lib_semscore/logs/STS-B/dev-parts', 'dev-adj_matrix-')
+            self.test_2, self.adj_test_2 = self.read_dataset_sentence_wise(params.dev, w2i, self.adj_test_2)
+        else:
+            self.dev = list(self.read_dataset(params.dev, w2i))
         # Setting pin memory and number of workers
         kwargs = {'num_workers': 4, 'pin_memory': True} if torch.cuda.is_available() else {}
 
-        dataset_train = ClassificationGraphDataSet(self.train, self.adj_train, self.params) if self.params.encoder >= 2 else \
+        dataset_train = ClassificationGraphDataSet(self.train, self.adj_train,
+                                                   self.params) if self.params.encoder >= 2 else \
             ClassificationDataSet(self.train, self.params)
         self.train_data_loader = torch.utils.data.DataLoader(dataset_train, batch_size=params.batch_size,
                                                              collate_fn=dataset_train.collate, shuffle=True,
@@ -55,11 +66,19 @@ class DataLoader:
         self.dev_data_loader = torch.utils.data.DataLoader(dataset_dev, batch_size=params.batch_size,
                                                            collate_fn=dataset_dev.collate, shuffle=False, **kwargs)
 
-        dataset_test = ClassificationGraphDataSet(self.test, self.adj_test, self.params) if self.params.encoder >= 2 else \
+        dataset_test = ClassificationGraphDataSet(self.test, self.adj_test,
+                                                  self.params) if self.params.encoder >= 2 else \
             ClassificationDataSet(self.test, self.params)
         self.test_data_loader = torch.utils.data.DataLoader(dataset_test, batch_size=params.batch_size,
                                                             collate_fn=dataset_test.collate, shuffle=False,
                                                             **kwargs)
+
+        dataset_test_2 = ClassificationGraphDataSet(self.test_2, self.adj_test_2,
+                                                    self.params) if self.params.encoder >= 2 else \
+            ClassificationDataSet(self.test_2, self.params)
+        self.test_data_loader_2 = torch.utils.data.DataLoader(dataset_test_2, batch_size=params.batch_size,
+                                                              collate_fn=dataset_test_2.collate, shuffle=False,
+                                                              **kwargs)
 
     @staticmethod
     def read_dataset(filename, w2i):
@@ -112,7 +131,7 @@ class DataLoader:
     def load_adj_matrix(path, file_prefix):
         adjs = []
         for i in range(len(os.listdir(path))):
-             adjs.append(np.load(path + "/" + file_prefix + str(i) + '.npy'))
+            adjs.append(np.load(path + "/" + file_prefix + str(i) + '.npy'))
         return np.concatenate(adjs)
 
     @staticmethod
@@ -192,7 +211,8 @@ class ClassificationGraphDataSet(torch.utils.data.TensorDataset):
         return self.num_of_samples
 
     def __getitem__(self, idx):
-        return self.sents[idx], len(self.sents[idx]), self.labels[idx], self.adjs[idx] if self.adjs is not None else None
+        return self.sents[idx], len(self.sents[idx]), self.labels[idx], self.adjs[
+            idx] if self.adjs is not None else None
 
     def collate(self, batch):
         sents = np.array([x[0] for x in batch])
