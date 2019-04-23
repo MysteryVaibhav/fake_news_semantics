@@ -55,15 +55,18 @@ class Evaluator:
         model.load_state_dict(torch.load("models/" + self.params.model_file, map_location=lambda storage, loc: storage))
 
         model.eval()
-        accuracy, all_actual, all_predicted = self._evaluate_aux(model, self.data_loader.test_data_loader)
-        prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
-        prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
-        print("Accuracy on the OOD test set 1: {}".format(accuracy))
-        print("Precision on the OOD test set 1 macro / micro: {}, {}".format(prec_mac, prec_mic))
-        print("Recall on the OOD test set 1 macro / micro: {}, {}".format(recall_mac, recall_mic))
-        print("F1 on the OOD test set 1 macro / micro: {}, {}".format(f1_mac, f1_mic))
 
-        print("----------------------------------------------------------------------")
+        # This dataset is only available for the binary classifier
+        if self.params.ntags == 2:
+            accuracy, all_actual, all_predicted = self._evaluate_aux(model, self.data_loader.test_data_loader)
+            prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
+            prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
+            print("Accuracy on the OOD test set 1: {}".format(accuracy))
+            print("Precision on the OOD test set 1 macro / micro: {}, {}".format(prec_mac, prec_mic))
+            print("Recall on the OOD test set 1 macro / micro: {}, {}".format(recall_mac, recall_mic))
+            print("F1 on the OOD test set 1 macro / micro: {}, {}".format(f1_mac, f1_mic))
+
+            print("----------------------------------------------------------------------")
 
         accuracy, all_actual, all_predicted = self._evaluate_aux(model, self.data_loader.test_data_loader_2)
         prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')

@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 class DataLoader:
     def __init__(self, params):
         self.params = params
-
+        self.ntags = params.ntags
         # Dictionaries for word to index and vice versa
         w2i = freezable_defaultdict(lambda: len(w2i))
         # Adding unk token
@@ -39,15 +39,16 @@ class DataLoader:
         self.i2w = dict(map(reversed, self.w2i.items()))
         self.nwords = len(w2i)
         # Treating this as a binary classification problem for now "1: Satire, 4: Trusted"
-        self.ntags = params.ntags
         if self.params.encoder >= 2:
-            self.adj_test = self.load_adj_matrix('lib_semscore/logs/STS-B/test-parts', 'test-adj_matrix-')
+            self.adj_test = self.load_adj_matrix('lib_semscore/logs/STS-B/test-parts',
+                                                 'test-adj_matrix-') if self.params.use_ss == 1 else None
             self.test, self.adj_test = self.read_testset_sentence_wise(params.test, w2i, self.adj_test)
         else:
             self.test = self.read_testset(params.test, w2i)
 
         if self.params.encoder >= 2:
-            self.adj_test_2 = self.load_adj_matrix('lib_semscore/logs/STS-B/dev-parts', 'dev-adj_matrix-')
+            self.adj_test_2 = self.load_adj_matrix('lib_semscore/logs/STS-B/dev-parts',
+                                                   'dev-adj_matrix-') if self.params.use_ss == 1 else None
             self.test_2, self.adj_test_2 = self.read_dataset_sentence_wise(params.dev, w2i, self.adj_test_2)
         else:
             self.test_2 = list(self.read_dataset(params.dev, w2i))
@@ -80,16 +81,19 @@ class DataLoader:
                                                               collate_fn=dataset_test_2.collate, shuffle=False,
                                                               **kwargs)
 
-    @staticmethod
-    def read_dataset(filename, w2i):
+    def read_dataset(self, filename, w2i):
         with open(filename, "r") as f:
             readCSV = csv.reader(f, delimiter=',')
             csv.field_size_limit(100000000)
             for tag, words in readCSV:
                 tag = int(tag)
-                if tag in [1, 4]:
-                    # Adjust the tag to {0: Satire, 1: Trusted}
-                    yield ([w2i[x] for x in words.lower().split(" ")], tag - 1 if tag == 1 else tag - 3)
+                if self.ntags == 2:
+                    if tag in [1, 4]:
+                        # Adjust the tag to {0: Satire, 1: Trusted}
+                        yield ([w2i[x] for x in words.lower().split(" ")], tag - 1 if tag == 1 else tag - 3)
+                    else:
+                        # {0: Satire, 1: Hoax, 2: Propaganda, 3: Trusted}
+                        yield ([w2i[x] for x in words.lower().split(" ")], tag - 1)
 
     @staticmethod
     def read_testset(filename, w2i):
@@ -101,8 +105,7 @@ class DataLoader:
             data.append(([w2i[x] for x in row[2].lower().split(" ")], tag + 1 if tag == 0 else tag - 1))
         return data
 
-    @staticmethod
-    def read_dataset_sentence_wise(filename, w2i, adj):
+    def read_dataset_sentence_wise(self, filename, w2i, adj):
         data = []
         new_adj = []
         count = 0
@@ -112,9 +115,14 @@ class DataLoader:
             for tag, doc in readCSV:
                 sentences = doc.split('.')
                 tag = int(tag)
-                if tag in [1, 4]:
-                    # Adjust the tag to {0: Satire, 1: Trusted}
-                    tag = tag - 1 if tag == 1 else tag - 3
+                allowed_tags = [1, 4] if self.ntags == 2 else [1, 2, 3, 4]
+                if tag in allowed_tags:
+                    if self.ntags == 2:
+                        # Adjust the tag to {0: Satire, 1: Trusted}
+                        tag = tag - 1 if tag == 1 else tag - 3
+                    else:
+                        # {0: Satire, 1: Hoax, 2: Propaganda, 3: Trusted}
+                        tag -= 1
                     sentences_idx = []
                     for sentence in sentences:
                         sentence = sentence.lower().strip().split(" ")
