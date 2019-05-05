@@ -3,6 +3,10 @@ from model import Classify
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import confusion_matrix
+import seaborn as sn
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class Evaluator:
@@ -75,6 +79,14 @@ class Evaluator:
         print("Precision on the OOD test set 2 macro / micro: {}, {}".format(prec_mac, prec_mic))
         print("Recall on the OOD test set 2 macro / micro: {}, {}".format(recall_mac, recall_mic))
         print("F1 on the OOD test set 2 macro / micro: {}, {}".format(f1_mac, f1_mic))
+
+        if self.params.ntags == 4:
+            results = confusion_matrix(all_actual, all_predicted)
+            df_cm = pd.DataFrame(results, index=[i for i in ["Satire", "Hoax", "Propaganda", "Trusted"]],
+                                 columns=[i for i in ["Satire", "Hoax", "Propaganda", "Trusted"]])
+            sns_plot = sn.heatmap(df_cm, annot=True, fmt='g')
+            plt.yticks(rotation=45)
+            sns_plot.get_figure().savefig('plots/cm.png')
 
         print("----------------------------------------------------------------------")
 
