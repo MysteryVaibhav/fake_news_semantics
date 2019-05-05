@@ -211,11 +211,11 @@ class ClassificationDataSet(torch.utils.data.TensorDataset):
         return padded_tensor, torch.stack(labels)
 
 
-def get_data_loader(args, examples, tokenizer, bert_model, device):
+def get_data_loader(args, examples, tokenizer, bert_model, device, max_sents_in_a_doc):
     all_features = []
     all_labels = []
     for example, tag in examples:
-        sents = example.split(".")
+        sents = example.split(".")[:max_sents_in_a_doc]
         features = convert_examples_to_features(
             examples=sents, seq_length=args.max_sent_length, tokenizer=tokenizer)
         all_features.append(features)
@@ -267,6 +267,7 @@ def main():
     parser.add_argument("--hidden_dim", dest="hidden_dim", type=int, default=100)
     parser.add_argument("--lr", dest="lr", type=float, default=1e-3)
     parser.add_argument("--config", dest="config", type=str, default='bert', help='Name for saving plots')
+    parser.add_argument("--max_sents_in_a_doc", dest="max_sents_in_a_doc", type=int, default=1000)
     parser.add_argument("--max_seq_length", default=500, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. Sequences longer "
                              "than this will be truncated, and sequences shorter than this will be padded.")
@@ -288,10 +289,10 @@ def main():
     print("Preparing data...")
     train_examples = read_examples(args.train, args.max_seq_length, args.ntags)
     train_examples, dev_examples = train_test_split(train_examples, test_size=0.2, random_state=42)
-    train_dataloader = get_data_loader(args, train_examples, tokenizer, bert_model, device)
+    train_dataloader = get_data_loader(args, train_examples, tokenizer, bert_model, device, args.max_sents_in_a_doc)
 
     # dev_examples = read_examples(args.dev, args.max_seq_length)
-    dev_dataloader = get_data_loader(args, dev_examples, tokenizer, bert_model, device)
+    dev_dataloader = get_data_loader(args, dev_examples, tokenizer, bert_model, device, args.max_sents_in_a_doc)
     print("Preparing data...[OK]")
 
     if args.mode == 0:
@@ -397,7 +398,7 @@ def main():
             print("----------------------------------------------------------------------")
 
         test_2_examples = read_examples(args.dev, args.max_seq_length, args.ntags)
-        test_2_dataloader = get_data_loader(args, test_2_examples, tokenizer, bert_model, device)
+        test_2_dataloader = get_data_loader(args, test_2_examples, tokenizer, bert_model, device, args.max_sents_in_a_doc)
 
         accuracy, all_actual, all_predicted = _evaluate_aux(model, test_2_dataloader)
         prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
