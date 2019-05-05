@@ -135,7 +135,7 @@ def _truncate_seq_pair(tokens_a, tokens_b, max_length):
             tokens_b.pop()
 
 
-def read_examples(filename, max_seq_length):
+def read_examples(filename, max_seq_length, ntags):
     """Read a list of `InputExample`s from an input file."""
     examples = []
     with open(filename, "r") as f:
@@ -143,9 +143,12 @@ def read_examples(filename, max_seq_length):
         csv.field_size_limit(100000000)
         for tag, words in readCSV:
             tag = int(tag)
-            if tag in [1, 4]:
-                # Adjust the tag to {0: Satire, 1: Trusted}
-                examples.append((words.lower()[:max_seq_length], tag - 1 if tag == 1 else tag - 3))
+            if ntags == 2:
+                if tag in [1, 4]:
+                    # Adjust the tag to {0: Satire, 1: Trusted}
+                    examples.append((words.lower()[:max_seq_length], tag - 1 if tag == 1 else tag - 3))
+            else:
+                examples.append((words.lower()[:max_seq_length], tag - 1))
     return examples
 
 
@@ -267,6 +270,7 @@ def main():
                         help="The maximum total input sequence length after WordPiece tokenization. Sequences longer "
                              "than this will be truncated, and sequences shorter than this will be padded.")
     parser.add_argument("--max_sent_length", default=70, type=int)
+    parser.add_argument("--ntags", dest="ntags", type=int, default=2)
     parser.add_argument("--weight_decay", dest="weight_decay", type=float, default=1e-5)
     parser.add_argument("--batch_size", default=2, type=int, help="Batch size for predictions.")
     parser.add_argument("--mode", dest="mode", type=int, default=1, help='0: train, 1:test')
@@ -291,7 +295,7 @@ def main():
 
     if args.mode == 0:
 
-        model = BertForClassification(args, 2)
+        model = BertForClassification(args, args.ntags)
         model.to(device)
 
         loss_fn = torch.nn.CrossEntropyLoss()
@@ -365,12 +369,13 @@ def main():
 
     elif args.mode == 1:
 
-        print("Preparing data...")
-        test_examples = read_testset(args.test, args.max_seq_length)
-        test_data_loader = get_data_loader(args, test_examples, tokenizer, bert_model, device)
-        print("Preparing data...[OK]")
+        if args.ntags == 2:
+            print("Preparing data...")
+            test_examples = read_testset(args.test, args.max_seq_length)
+            test_data_loader = get_data_loader(args, test_examples, tokenizer, bert_model, device)
+            print("Preparing data...[OK]")
 
-        model = BertForClassification(args, 2)
+        model = BertForClassification(args, args.ntags)
         model.to(device)
 
         if torch.cuda.is_available():
@@ -379,15 +384,16 @@ def main():
         model.load_state_dict(torch.load("models/" + args.model_file, map_location=lambda storage, loc: storage))
         model.eval()
 
-        accuracy, all_actual, all_predicted = _evaluate_aux(model, test_data_loader)
-        prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
-        prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
-        print("Accuracy on the OOD test set 1: {}".format(accuracy))
-        print("Precision on the OOD test set 1 macro / micro: {}, {}".format(prec_mac, prec_mic))
-        print("Recall on the OOD test set 1 macro / micro: {}, {}".format(recall_mac, recall_mic))
-        print("F1 on the OOD test set 1 macro / micro: {}, {}".format(f1_mac, f1_mic))
+        if args.ntags == 2:
+            accuracy, all_actual, all_predicted = _evaluate_aux(model, test_data_loader)
+            prec_mac, recall_mac, f1_mac, _ = precision_recall_fscore_support(all_actual, all_predicted, average='macro')
+            prec_mic, recall_mic, f1_mic, _ = precision_recall_fscore_support(all_actual, all_predicted, average='micro')
+            print("Accuracy on the OOD test set 1: {}".format(accuracy))
+            print("Precision on the OOD test set 1 macro / micro: {}, {}".format(prec_mac, prec_mic))
+            print("Recall on the OOD test set 1 macro / micro: {}, {}".format(recall_mac, recall_mic))
+            print("F1 on the OOD test set 1 macro / micro: {}, {}".format(f1_mac, f1_mic))
 
-        print("----------------------------------------------------------------------")
+            print("----------------------------------------------------------------------")
 
         test_2_examples = read_examples(args.dev, args.max_seq_length)
         test_2_dataloader = get_data_loader(args, test_2_examples, tokenizer, bert_model, device)
