@@ -247,6 +247,7 @@ def _evaluate_aux(model, data_loader):
     accuracy = hits / total
     return accuracy, all_actual, all_predicted
 
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -285,7 +286,7 @@ def main():
     bert_model.to(device)
 
     print("Preparing data...")
-    train_examples = read_examples(args.train, args.max_seq_length)
+    train_examples = read_examples(args.train, args.max_seq_length, args.ntags)
     train_examples, dev_examples = train_test_split(train_examples, test_size=0.2, random_state=42)
     train_dataloader = get_data_loader(args, train_examples, tokenizer, bert_model, device)
 
@@ -395,7 +396,7 @@ def main():
 
             print("----------------------------------------------------------------------")
 
-        test_2_examples = read_examples(args.dev, args.max_seq_length)
+        test_2_examples = read_examples(args.dev, args.max_seq_length, args.ntags)
         test_2_dataloader = get_data_loader(args, test_2_examples, tokenizer, bert_model, device)
 
         accuracy, all_actual, all_predicted = _evaluate_aux(model, test_2_dataloader)
