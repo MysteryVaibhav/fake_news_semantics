@@ -201,4 +201,12 @@ LSTM + GAT + 2 Attn Heads| 66.94 | 68.05 | 66.86 | 66.37 / 66.95
 LSTM + GAT + 2 Attn Heads + Semantic Adj | |  |  |
 SoTA | - | - | - | 65.0 |
 
+### Document classification
+
+### AG News
+Model | Acc | Test Error Rate
+--- | --- | --- 
+GAT | 89.61 | 10.39
+GAT + 2 Attn Heads | |
+
 
