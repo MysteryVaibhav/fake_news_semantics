@@ -207,6 +207,6 @@ SoTA | - | - | - | 65.0 |
 Model | Acc | Test Error Rate
 --- | --- | --- 
 GAT | 89.61 | 10.39
-GAT + 2 Attn Heads | |
+GAT + 2 Attn Heads | 89.72 | 10.28
 
 
