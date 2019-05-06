@@ -208,18 +208,20 @@ Model | Acc | Test Error Rate
 --- | --- | --- 
 GAT | 89.61 | 10.39
 GAT + 2 Attn Heads | 89.72 | 10.28
+SOTA | | 5.01
 
 ### IMDB (2 sentiment categories)
 Model | Acc | Test Error Rate
 --- | --- | --- 
-GAT | 100.00 | 0.00
-GAT + 2 Attn Heads | 100.00 | 0.00
+GAT |  |
+GAT + 2 Attn Heads | | 
+SOTA | | 4.6
 
 ### DBPedia (14 ontology categories)
 Model | Acc | Test Error Rate
 --- | --- | --- 
-GAT |  | 
+GAT | 99.13 | 0.87 
 GAT + 2 Attn Heads | | 
-
+SOTA | | 0.80
 
 
