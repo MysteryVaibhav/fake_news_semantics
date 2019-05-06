@@ -209,4 +209,9 @@ Model | Acc | Test Error Rate
 GAT | 89.61 | 10.39
 GAT + 2 Attn Heads | 89.72 | 10.28
 
+### IMDB
+Model | Acc | Test Error Rate
+--- | --- | --- 
+GAT | 100.00 | 0.00
+GAT + 2 Attn Heads | 100.00 | 0.00
 
