@@ -220,7 +220,7 @@ SOTA | | 4.6
 ### DBPedia (14 ontology categories)
 Model | Acc | Test Error Rate
 --- | --- | --- 
-GAT | 99.13 | 0.87 
+GAT | 99.13 |
 GAT + 2 Attn Heads | | 
 SOTA | | 0.80
 
