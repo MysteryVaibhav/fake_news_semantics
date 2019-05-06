@@ -203,15 +203,23 @@ SoTA | - | - | - | 65.0 |
 
 ### Document classification
 
-### AG News
+### AG News (4 news categories)
 Model | Acc | Test Error Rate
 --- | --- | --- 
 GAT | 89.61 | 10.39
 GAT + 2 Attn Heads | 89.72 | 10.28
 
-### IMDB
+### IMDB (2 sentiment categories)
 Model | Acc | Test Error Rate
 --- | --- | --- 
 GAT | 100.00 | 0.00
 GAT + 2 Attn Heads | 100.00 | 0.00
+
+### DBPedia (14 ontology categories)
+Model | Acc | Test Error Rate
+--- | --- | --- 
+GAT |  | 
+GAT + 2 Attn Heads | | 
+
+
 
