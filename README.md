@@ -1,5 +1,6 @@
 # Using Semantics to Understand Fake News
-Attempt to identify / use semantics in fake news using deep learning techniques.
+Code for the EMNLP 2019 workshop (TextGraphs) paper "Do Sentence Interactions Matter ? Leveraging Sentence Level Representations for Fake News Classification"
+
 
 Make sure the following files are present as per the directory structure before running the code,
 ```
@@ -12,6 +13,11 @@ fake_news_semantics
     │   fulltrain.csv
     |   test.xsls
 ```
+
+balancedtest.csv and fulltrain.csv can be obtained from https://homes.cs.washington.edu/~hrashkin/fact_checking_files/newsfiles.tar.gz
+
+test.xsls is basically the SLN dataset according to the paper. You can obtain this dataset from http://victoriarubin.fims.uwo.ca/news-verification/data-to-go/
+Contact me if you have trouble finding these datasets.
 
 Dependencies,
 ```
@@ -86,21 +92,6 @@ python main.py --batch_size 32 --max_sent_len 50 --encoder 4 --model_file model_
 
 ## Baseline Results
 
-### In domain test set accuracy
-Model | Acc | Prec | Recall | F1
---- | --- | --- | --- | ---
-CNN | 92.3 | | |
-LSTM | 91.4 | | | 
-BERT | 88.0 | | | 
-LSTM + GCN + Max Pool | 92.8 | | | 
-LSTM + GCN + Max Pool + Semantic Adj | 92.7 | | | 
-LSTM + GCN + Attn | 93.6 | | |
-LSTM + GCN + Attn + Semantic Adj| 93.3 | | |
-LSTM + GAT | 93.4 | | |
-LSTM + GAT + Semantic Adj | 93.7 | | |
-LSTM + GAT + 2 Attn Heads| 93.5 | | |
-LSTM + GAT + 2 Attn Heads + Semantic Adj | 92.5 | | |
-
 ### Out of domain test set accuracy
 Model | Acc | Prec | Recall | F1
 --- | --- | --- | --- | ---
@@ -115,7 +106,7 @@ LSTM + GAT | 86.1 | 86.2 | 86.1 | 86.1
 LSTM + GAT + Semantic Adj | 87.5 | 87.5 | 87.5 | 87.4 
 LSTM + GAT + 2 Attn Heads| 88.6 | 89.1 | 88.9 | 88.9
 LSTM + GAT + 2 Attn Heads + Semantic Adj | 84.7 | 85.2 | 84.7 | 84.6 
-SoTA | - | 90.0 | 84.0 | 87.0
+SoTA | - | 88.0 | 82.0 | 
 
 ### Results with a dev/test split based on news sources: This might be a more realistic split
 
@@ -150,7 +141,7 @@ LSTM + GAT |86.39| 86.44|86.38 |86.38
 LSTM + GAT + Semantic Adj | 85.27| 85.31| 85.27|85.27
 LSTM + GAT + 2 Attn Heads| 84.72| 85.65| 84.72|84.62
 LSTM + GAT + 2 Attn Heads + Semantic Adj | 86.94 | 87.04| 86.94|86.94
-SoTA | - | 90.0 | 84.0 | 87.0
+SoTA | - | 88.0 | 82.0 | 
 
 ### Out of domain test set 2 accuracy
 Model | Acc | Prec | Recall | F1
@@ -201,6 +192,8 @@ LSTM + GAT + 2 Attn Heads| 66.94 | 68.05 | 66.86 | 66.37 / 66.95
 LSTM + GAT + 2 Attn Heads + Semantic Adj | |  |  |
 SoTA | - | - | - | 65.0 |
 
+For more structured results, refer to the tables in the paper. The following results are for document classification when applied to non-fake news domain.
+
 ### Document classification
 
 ### AG News (4 news categories)
@@ -224,4 +217,9 @@ GAT | 99.13 |
 GAT + 2 Attn Heads | | 
 SOTA | | 0.80
 
+If you find this work useful in your research, please consider citing the paper using following bibtex:
 
+#### Bibtex
+```
+Coming soon.
+```
