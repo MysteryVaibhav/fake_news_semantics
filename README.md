@@ -1,5 +1,5 @@
 # Using Semantics to Understand Fake News
-Code for the EMNLP 2019 workshop (TextGraphs) paper "Do Sentence Interactions Matter ? Leveraging Sentence Level Representations for Fake News Classification"
+Code for the EMNLP 2019 workshop (TextGraphs) paper ["Do Sentence Interactions Matter ? Leveraging Sentence Level Representations for Fake News Classification"](https://arxiv.org/pdf/1910.12203.pdf)
 
 
 Make sure the following files are present as per the directory structure before running the code,
