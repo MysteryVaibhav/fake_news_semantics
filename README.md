@@ -220,6 +220,21 @@ SOTA | | 0.80
 If you find this work useful in your research, please consider citing the paper using following bibtex:
 
 #### Bibtex
+If you found this work or code useful for your research, please cite us!
 ```
-Coming soon.
+@inproceedings{vaibhav-etal-2019-sentence,
+    title = "Do Sentence Interactions Matter? Leveraging Sentence Level Representations for Fake News Classification",
+    author = "Vaibhav, Vaibhav  and
+      Mandyam, Raghuram  and
+      Hovy, Eduard",
+    booktitle = "Proceedings of the Thirteenth Workshop on Graph-Based Methods for Natural Language Processing (TextGraphs-13)",
+    month = nov,
+    year = "2019",
+    address = "Hong Kong",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D19-5316",
+    doi = "10.18653/v1/D19-5316",
+    pages = "134--139",
+    abstract = "The rising growth of fake news and misleading information through online media outlets demands an automatic method for detecting such news articles. Of the few limited works which differentiate between trusted vs other types of news article (satire, propaganda, hoax), none of them model sentence interactions within a document. We observe an interesting pattern in the way sentences interact with each other across different kind of news articles. To capture this kind of information for long news articles, we propose a graph neural network-based model which does away with the need of feature engineering for fine grained fake news classification. Through experiments, we show that our proposed method beats strong neural baselines and achieves state-of-the-art accuracy on existing datasets. Moreover, we establish the generalizability of our model by evaluating its performance in out-of-domain scenarios. Code is available at https://github.com/MysteryVaibhav/fake{\textbackslash}{\_}news{\textbackslash}{\_}semantics.",
+}
 ```
